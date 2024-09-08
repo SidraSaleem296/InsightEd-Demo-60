@@ -1,0 +1,147 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mongodb"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId], name: "userId")
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], name: "userId")
+}
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  credits       Int       @default(10)
+  games         Game[]
+  accounts      Account[]
+  sessions      Session[]
+}
+
+model Course {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  name  String
+  image String
+  units Unit[]
+
+  @@index([name], name: "course_name")
+}
+
+model Unit {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  courseId String
+
+  name     String
+  course   Course    @relation(fields: [courseId], references: [id])
+  chapters Chapter[]
+
+  @@index([courseId], name: "unit_courseId")
+}
+
+model Chapter {
+  id                 String      @id @default(auto()) @map("_id") @db.ObjectId
+  unitId             String
+  name               String
+  youtubeSearchQuery String
+  videoId            String?
+  summary            String?
+  unit               Unit        @relation(fields: [unitId], references: [id])
+  questionsC         QuestionC[] // Added to create the relation with QuestionC
+
+  @@index([unitId], name: "chapter_unitId")
+}
+
+model Question {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  question          String
+  answer            String
+  gameId            String
+  options           Json? // for mcq questions
+  percentageCorrect Float? // for open_ended questions
+  isCorrect         Boolean? // for mcq questions
+  questionType      GameType
+  userAnswer        String?
+  game              Game     @relation(fields: [gameId], references: [id])
+
+  @@index([gameId])
+}
+
+enum GameType {
+  mcq
+  open_ended
+}
+
+model Game {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String
+  questions   Question[]
+  timeStarted DateTime
+  topic       String
+  timeEnded   DateTime?
+  gameType    GameType
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model topic_count {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  topic String @unique
+  count Int
+}
+
+model UserSubscription {
+  id                     String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId                 String    @unique
+  stripeCustomerId       String    @unique @map(name: "stripe_customer_id")
+  stripeSubscriptionId   String?   @unique @map(name: "stripe_subscription_id")
+  stripePriceId          String?   @map(name: "stripe_price_id")
+  stripeCurrentPeriodEnd DateTime? @map(name: "stripe_current_period_end")
+}
+
+// Updated QuestionC Model
+model QuestionC {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  chapterId String
+
+  question String
+  answer   String
+  options  String
+  chapter  Chapter  @relation(fields: [chapterId], references: [id])
+
+  @@index([chapterId], name: "chapterId")
+}
