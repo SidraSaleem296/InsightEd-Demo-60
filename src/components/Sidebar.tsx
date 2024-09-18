@@ -614,7 +614,7 @@ export function SidebarMenu() {
         {
             name: "Report Generation",
             icon: <FileText size={15} className="mr-2" />,
-            href: "/statistics/[",
+            href: "/history",
         },
         {
             name: "History",
