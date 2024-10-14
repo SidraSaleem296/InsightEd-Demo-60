@@ -344,33 +344,33 @@
 // }
 
 
-"use client";
+// "use client";
 
-import { Result } from "@/components/result";
-import { Search } from "@/components/search";
-import { Title } from "@/components/title";
-import { useSearchParams } from "next/navigation";
+// import { Result } from "@/components/result";
+// import { Search } from "@/components/search";
+// import { Title } from "@/components/title";
+// import { useSearchParams } from "next/navigation";
 
-export default function SearchPage() {
-  const searchParams = useSearchParams();
-  const query = decodeURIComponent(searchParams.get("q") || "");
-  const rid = decodeURIComponent(searchParams.get("rid") || "");
+// export default function SearchPage() {
+//   const searchParams = useSearchParams();
+//   const query = decodeURIComponent(searchParams.get("q") || "");
+//   const rid = decodeURIComponent(searchParams.get("rid") || "");
 
-  return (
-    <div className="max-h-screen flex flex-col items-center justify-center bg-white dark:bg-black">
-      <div className="relative w-full max-w-4xl p-4 bg-white dark:bg-black rounded-2xl shadow-none">
-        <div className="px-6 md:px-10 pt-6 pb-8 border border-gray-200 dark:border-black dark:bg-black">
-          <Title query={query} />
-          <Result key={rid} query={query} rid={rid} />
-        </div>
-        <div className="mt-6 flex items-center justify-center">
-          <div className="w-full max-w-lg">
-            <Search />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+//   return (
+//     <div className="max-h-screen flex flex-col items-center justify-center bg-white dark:bg-black">
+//       <div className="relative w-full max-w-4xl p-4 bg-white dark:bg-black rounded-2xl shadow-none">
+//         <div className="px-6 md:px-10 pt-6 pb-8 border border-gray-200 dark:border-black dark:bg-black">
+//           <Title query={query} />
+//           <Result key={rid} query={query} rid={rid} />
+//         </div>
+//         <div className="mt-6 flex items-center justify-center">
+//           <div className="w-full max-w-lg">
+//             <Search />
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
 
 
