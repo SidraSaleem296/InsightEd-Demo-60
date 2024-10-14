@@ -89,18 +89,11 @@
 // module.exports = nextConfig;
 
 
-
-const nextConfig = {
+module.exports = {
   images: {
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'lh3.googleusercontent.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 's3.us-west-2.amazonaws.com',
-      },
+      { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
+      { protocol: 'https', hostname: 's3.us-west-2.amazonaws.com' },
     ],
   },
   eslint: {
@@ -109,19 +102,19 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  output: "standalone",
-  productionBrowserSourceMaps: true, 
+  output: 'standalone',
+  productionBrowserSourceMaps: true,
   webpack: (config) => {
     config.resolve.fallback = {
-      ...config.resolve.fallback, // Merge with existing fallback settings
-      crypto: false, 
+      ...config.resolve.fallback,
+      crypto: false,
       http: false,
       https: false,
-      process: require.resolve('process/browser'), // Add process polyfill
+      process: require.resolve('process/browser'),
     };
     return config;
   },
-  // Adding rewrites to ensure API and search pages are handled dynamically
+  // Explicitly adding redirects for dynamic routes
   async rewrites() {
     return [
       {
@@ -134,12 +127,8 @@ const nextConfig = {
       },
     ];
   },
-  experimental: {
-    appDir: true, // Enabling experimental appDir support for dynamic handling
-  },
 };
 
-module.exports = nextConfig;
 
 
 
