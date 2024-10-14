@@ -3,10 +3,6 @@
     {
       "source": "/api/stripe",
       "destination": "/api/stripe"
-    },
-    {
-      "source": "/search",
-      "destination": "/search"
     }
   ]
 }
