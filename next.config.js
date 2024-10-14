@@ -51,6 +51,44 @@
 
 // module.exports = nextConfig;
 
+//before deployment 0ct 14
+// const nextConfig = {
+//   images: {
+//     remotePatterns: [
+//       {
+//         protocol: 'https',
+//         hostname: 'lh3.googleusercontent.com',
+//       },
+//       {
+//         protocol: 'https',
+//         hostname: 's3.us-west-2.amazonaws.com',
+//       },
+//     ],
+//   },
+//   eslint: {
+//     ignoreDuringBuilds: true,
+//   },
+//   typescript: {
+//     ignoreBuildErrors: true,
+//   },
+//   output: "standalone",
+//   productionBrowserSourceMaps: true, 
+//   webpack: (config) => {
+//     config.resolve.fallback = {
+//       ...config.resolve.fallback, // Merge with existing fallback settings
+//       crypto: false, 
+//       http: false,
+//       https: false,
+//       // Disable crypto module on client-side
+//       process: require.resolve('process/browser'), // Add process polyfill
+//     };
+//     return config;
+//   },
+// };
+
+// module.exports = nextConfig;
+
+
 
 const nextConfig = {
   images: {
@@ -79,14 +117,31 @@ const nextConfig = {
       crypto: false, 
       http: false,
       https: false,
-      // Disable crypto module on client-side
       process: require.resolve('process/browser'), // Add process polyfill
     };
     return config;
   },
+  // Adding rewrites to ensure API and search pages are handled dynamically
+  async rewrites() {
+    return [
+      {
+        source: '/api/stripe',
+        destination: '/api/stripe',
+      },
+      {
+        source: '/search',
+        destination: '/search',
+      },
+    ];
+  },
+  experimental: {
+    appDir: true, // Enabling experimental appDir support for dynamic handling
+  },
 };
 
 module.exports = nextConfig;
+
+
 
 // const webpack = require('webpack');
 
