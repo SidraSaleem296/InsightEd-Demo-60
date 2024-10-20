@@ -203,3 +203,38 @@
 
 // export const runtime = 'edge';
 
+
+
+// Import required modules
+require('dotenv').config();
+import fetch from 'node-fetch';
+
+// Define a function to test the OpenAI API key
+async function testOpenAIKey() {
+    try {
+        // Make a request to the OpenAI API to list available models
+        const response = await fetch('https://api.openai.com/v1/models', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        // Check if the response is OK
+        if (!response.ok) {
+            throw new Error(`Failed to fetch models. Status: ${response.status}`);
+        }
+
+        // Parse and log the response data
+        const data = await response.json();
+        console.log('Models:', data);
+
+    } catch (error) {
+        // Log any errors that occur
+        console.error('Error testing OpenAI API key:', error.message);
+    }
+}
+
+// Run the test function
+testOpenAIKey();
