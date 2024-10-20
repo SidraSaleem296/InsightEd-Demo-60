@@ -14,7 +14,7 @@ const SocialPlatform = (pageProps) => {
       <h1>This is Social Platform</h1>
 
       {/* Render your PostFeed or other components here */}
-      <PostFeed />
+      <Sidebar></Sidebar>
     </Layout>
   );
 };
