@@ -13,9 +13,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <Layout>
       <Toaster />
 
-      <h1>This is Social Platform</h1>
-
-      {/* <Component {...pageProps} />  */}
+      <Component {...pageProps} /> 
     </Layout>
   );
 }
