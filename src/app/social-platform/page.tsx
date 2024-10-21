@@ -9,13 +9,16 @@ import PostFeed from "@/components/posts/PostFeed";
 // Make sure this component is defined as a client component if it uses client hooks
 const SocialPlatform = (pageProps) => {
   return (
-    <Layout>
+        <SessionProvider session={pageProps.session}>
       <Toaster />
-      <h1>This is Social Platform</h1>
+      <EditModal />
+      <RegisterModal/>
+      <LoginModal/>
+      <Layout>
+        <Component {...pageProps} />;
+      </Layout>
+    </SessionProvider>
 
-      {/* Render your PostFeed or other components here */}
-      <Sidebar></Sidebar>
-    </Layout>
   );
 };
 
