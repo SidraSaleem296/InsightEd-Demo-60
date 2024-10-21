@@ -1,15 +1,15 @@
-// /app/social-platform/page.tsx
-
-import Layout from "@/app/layout"; // Ensure this import path is correct
-import { Toaster } from 'react-hot-toast';
+import Layout from "@/components/Layout";
+import {Toaster} from 'react-hot-toast';
+import { SessionProvider } from "next-auth/react";
+import LoginModal from "@/components/modals/LoginModal";
+import RegisterModal from "@/components/modals/RegisterModal";
 import "@/styles/globals.css";
-import { AppProps } from "next/app"; // Not needed here if you are using a page
-import PostFeed from "@/components/posts/PostFeed";
+import type { AppProps } from "next/app";
+import EditModal from "@/components/modals/EditModal";
 
-// Make sure this component is defined as a client component if it uses client hooks
-const SocialPlatform = (pageProps) => {
-  return (
-        <SessionProvider session={pageProps.session}>
+export default function App({ Component, pageProps }: AppProps) {
+  return(
+    <SessionProvider session={pageProps.session}>
       <Toaster />
       <EditModal />
       <RegisterModal/>
@@ -18,9 +18,5 @@ const SocialPlatform = (pageProps) => {
         <Component {...pageProps} />;
       </Layout>
     </SessionProvider>
-
-  );
-};
-
-// If this is a page, you don’t need to export as App. Just export the page component
-export default SocialPlatform;
+  ) 
+}
