@@ -1,3 +1,5 @@
+// Add this line at the top of your /api/stripe route
+export const dynamic = 'force-dynamic';
 import { getAuthSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
