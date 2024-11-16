@@ -396,10 +396,10 @@ function SearchPageContent() {
 
 export default function SearchPage() {
   return (
-    <ClerkProvider>
+    // <ClerkProvider>
       <ConvexProvider client={convex}>
         <SearchPageContent />
       </ConvexProvider>
-    </ClerkProvider>
+    // {/* </ClerkProvider> */}
   );
 }
