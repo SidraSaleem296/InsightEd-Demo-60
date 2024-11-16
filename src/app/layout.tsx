@@ -157,7 +157,7 @@
 
 import { cn } from "@/lib/utils";
 import "./globals.css";
-import type { Metadata } from "next";
+// import type { Metadata } from "next";
 import { Lexend } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import { Provider } from "@/components/Providers";
@@ -168,9 +168,9 @@ import { TooltipProvider } from '@radix-ui/react-tooltip';  // Import TooltipPro
 
 const lexend = Lexend({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
-  title: "InsightEd",
-};
+// export const metadata: Metadata = {
+//   title: "InsightEd",
+// };
 
 export default function RootLayout({
   children,
