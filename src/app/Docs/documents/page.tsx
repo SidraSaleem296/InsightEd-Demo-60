@@ -347,5 +347,6 @@ export default function Home() {
         <DocumentPage />
       </ConvexProvider>
     </ClerkProvider>
+    
   );
 }

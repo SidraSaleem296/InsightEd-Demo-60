@@ -416,6 +416,7 @@ import { api } from "@/convex/_generated/api";
 import Link from "next/link";
 import { FileIcon, BookIcon } from "lucide-react";
 import { ConvexProvider, ConvexReactClient } from "convex/react";
+import { ClerkProvider } from "@clerk/nextjs";
 
 const convex = new ConvexReactClient("https://secret-squid-182.convex.cloud");
 
@@ -503,8 +504,10 @@ function SearchPageContent() {
 
 export default function SearchPage() {
   return (
+    <ClerkProvider>
     <ConvexProvider client={convex}>
       <SearchPageContent />
     </ConvexProvider>
+    </ClerkProvider>
   );
 }
