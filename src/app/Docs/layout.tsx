@@ -1,6 +1,6 @@
 import { Clipboard, Cog, FilesIcon } from "lucide-react";
 import Link from "next/link";
-import NavBar from "./side-nav";
+// import NavBar from "./side-nav";
 
 export default function DashboardLayout({
   children,
@@ -9,7 +9,7 @@ export default function DashboardLayout({
 }>) {
   return (
     <div className="flex gap-24 container mx-auto pt-12">
-      <NavBar />
+      {/* <NavBar /> */}
 
       {children}
     </div>

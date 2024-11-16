@@ -1,6 +1,6 @@
 import CommentFeed from "@/components/posts/CommentFeed";
 import Form from "@/components/Form";
-import Header from "@/components/Header";
+import Header from "@/components/Header1";
 import PostItem from "@/components/posts/PostItem";
 import usePost from "@/hooks/usePost";
 import { useRouter } from "next/router";

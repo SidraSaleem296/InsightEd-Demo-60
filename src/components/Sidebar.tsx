@@ -588,6 +588,21 @@ export function SidebarMenu() {
                     name: "Gallery",
                     icon: <Calendar size={15} className="mr-2" />,
                     href: "/gallery",
+                },
+                {
+                    name: "Documents",
+                    icon: <Calendar size={15} className="mr-2" />,
+                    href: "/Docs/documents",
+                },
+                {
+                    name: "Notes",
+                    icon: <Clipboard size={15} className="mr-2" />,
+                    href: "/Docs/notes",
+                },
+                {
+                    name: "Chat",
+                    icon: <Calendar size={15} className="mr-2" />,
+                    href: "/Docs/search",
                 }
             ],
         },
@@ -620,11 +635,6 @@ export function SidebarMenu() {
             name: "History",
             icon: <FileText size={15} className="mr-2" />,
             href: "/history",
-        },
-        {
-            name: "Documents",
-            icon: <Users size={15} className="mr-2" />,
-            href: "/Docs/documents",
         },
         {
             name: "Search",

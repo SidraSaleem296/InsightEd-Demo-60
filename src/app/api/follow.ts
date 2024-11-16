@@ -29,7 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             try{
                 await prisma.notifications.create({
                     data:{
-                        body: `@${currentUser?.name} started Following you` ,
+                        body: `@${currentUser?.username} started Following you` ,
                         userId
                     }
                 })

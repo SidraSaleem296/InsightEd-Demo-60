@@ -1,30 +1,74 @@
+// import { v } from "convex/values";
+// import { internalMutation, internalQuery } from "./_generated/server";
+// import { hasOrgAccess } from "./documents";
+
+// export const addUserIdToOrg = internalMutation({
+//   args: {
+//     // orgId: v.string(),
+//     userId: v.string(),
+//   },
+//   async handler(ctx, args) {
+//     await ctx.db.insert("memberships", {
+//       // orgId: args.orgId,
+//       userId: args.userId,
+//     });
+//   },
+// });
+
+// export const removeUserIdFromOrg = internalMutation({
+//   args: {
+//     // orgId: v.string(),
+//     userId: v.string(),
+//   },
+//   async handler(ctx, args) {
+//     const membership = await ctx.db
+//       .query("memberships")
+//       .withIndex("by_userId", (q) =>
+//         q.eq("userId", args.userId)
+//       )
+//       .first();
+
+//     if (membership) {
+//       await ctx.db.delete(membership._id);
+//     }
+//   },
+// });
+
+// export const hasOrgAccessQuery = internalQuery({
+//   args: {
+//     // orgId: v.string(),
+//   },
+//   async handler(ctx, args) {
+//     return await hasOrgAccess(ctx, args.userId);
+//   },
+// });
+
+
 import { v } from "convex/values";
 import { internalMutation, internalQuery } from "./_generated/server";
-import { hasOrgAccess } from "./documents";
 
-export const addUserIdToOrg = internalMutation({
+// Adds a user to the "memberships" collection
+export const addUser = internalMutation({
   args: {
-    orgId: v.string(),
     userId: v.string(),
   },
   async handler(ctx, args) {
     await ctx.db.insert("memberships", {
-      orgId: args.orgId,
       userId: args.userId,
     });
   },
 });
 
-export const removeUserIdFromOrg = internalMutation({
+// Removes a user from the "memberships" collection
+export const removeUser = internalMutation({
   args: {
-    orgId: v.string(),
     userId: v.string(),
   },
   async handler(ctx, args) {
     const membership = await ctx.db
       .query("memberships")
-      .withIndex("by_orgId_userId", (q) =>
-        q.eq("orgId", args.orgId).eq("userId", args.userId)
+      .withIndex("by_userId", (q) =>
+        q.eq("userId", args.userId)
       )
       .first();
 
@@ -34,11 +78,19 @@ export const removeUserIdFromOrg = internalMutation({
   },
 });
 
-export const hasOrgAccessQuery = internalQuery({
+// Query to check if a user has access (if required for other logic)
+export const hasUserAccessQuery = internalQuery({
   args: {
-    orgId: v.string(),
+    userId: v.string(),
   },
   async handler(ctx, args) {
-    return await hasOrgAccess(ctx, args.orgId);
+    const membership = await ctx.db
+      .query("memberships")
+      .withIndex("by_userId", (q) =>
+        q.eq("userId", args.userId)
+      )
+      .first();
+
+    return !!membership;
   },
 });

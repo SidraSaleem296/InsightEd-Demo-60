@@ -38,7 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 if(post?.userId){
                     await prisma.notifications.create({
                         data:{
-                            body: `@${currentUser?.name} Liked your Post "${post.body}"` ,
+                            body: `@${currentUser?.username} Liked your Post "${post.body}"` ,
                             userId: post.userId
                         }
                     })

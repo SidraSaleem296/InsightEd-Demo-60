@@ -7,7 +7,8 @@ import { Id } from "@/convex/_generated/dataModel";
 import { DeleteNoteButton } from "./delete-note-button";
 
 export default function NotePage() {
-  const { noteId } = useParams<{ noteId: Id<"notes"> }>();
+  // const { noteId } = useParams<{ noteId: Id<"notes"> }>();
+  const { noteId }: { noteId: Id<"notes"> } = useParams();
   const note = useQuery(api.notes.getNote, {
     noteId: noteId,
   });

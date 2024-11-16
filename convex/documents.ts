@@ -1,3 +1,577 @@
+// import {
+//   MutationCtx,
+//   QueryCtx,
+//   action,
+//   internalAction,
+//   internalMutation,
+//   internalQuery,
+//   mutation,
+//   query,
+// } from "./_generated/server";
+// import { ConvexError, v } from "convex/values";
+// import { internal } from "./_generated/api";
+// import OpenAI from "openai";
+// import { Id } from "./_generated/dataModel";
+// import { embed } from "./notes";
+
+// const openai = new OpenAI({
+//   apiKey: process.env.OPENAI_API_KEY,
+// });
+
+
+// export async function hasAccessToDocument(
+//   ctx: MutationCtx | QueryCtx,
+//   documentId: Id<"documents">
+// ) {
+//   const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
+
+//   if (!userId) {
+//     return null;
+//   }
+
+//   const document = await ctx.db.get(documentId);
+
+//   if (!document) {
+//     return null;
+//   }
+
+//   if (document.userId) {
+//     const hasAccess = await hasAccess(ctx, document.userId);
+
+//     if (!hasAccess) {
+//       return null;
+//     }
+//   } else {
+//     if (document.tokenIdentifier !== userId) {
+//       return null;
+//     }
+//   }
+
+//   return { document, userId };
+// }
+
+// export const hasAccessToDocumentQuery = internalQuery({
+//   args: {
+//     documentId: v.id("documents"),
+//   },
+//   async handler(ctx, args) {
+//     return await hasAccessToDocument(ctx, args.documentId);
+//   },
+// });
+
+// export const generateUploadUrl = mutation(async (ctx) => {
+//   return await ctx.storage.generateUploadUrl();
+// });
+
+// export const hasOrgAccess = async (
+//   ctx: MutationCtx | QueryCtx,
+//   orgId: string
+// ) => {
+//   const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
+
+//   if (!userId) {
+//     return false;
+//   }
+
+//   const membership = await ctx.db
+//     .query("memberships")
+//     .withIndex("by_userId", (q) => q.eq("userId", userId))
+//     .first();
+
+//   return !!membership;
+// };
+
+// export const getDocuments = query({
+//   args: {
+//     // orgId: v.optional(v.string()),
+//   },
+//   async handler(ctx, args) {
+//     const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
+
+//     if (!userId) {
+//       return undefined;
+//     }
+
+//     // if (args.orgId) {
+//     //   const isMember = await hasOrgAccess(ctx, args.orgId);
+//     //   if (!isMember) {
+//     //     return undefined;
+//     //   }
+
+//       return await ctx.db
+//         .query("documents")
+//         // .withIndex("by_orgId", (q) => q.eq("orgId", args.orgId))
+//         .collect();
+//     // } else {
+//       return await ctx.db
+//         .query("documents")
+//         .withIndex("by_tokenIdentifier", (q) => q.eq("tokenIdentifier", userId))
+//         .collect();
+//     // }
+//   },
+// });
+
+// export const getDocument = query({
+//   args: {
+//     documentId: v.id("documents"),
+//   },
+//   async handler(ctx, args) {
+//     const accessObj = await hasAccessToDocument(ctx, args.documentId);
+
+//     if (!accessObj) {
+//       return null;
+//     }
+
+//     return {
+//       ...accessObj.document,
+//       documentUrl: await ctx.storage.getUrl(accessObj.document.fileId),
+//     };
+//   },
+// });
+
+// export const createDocument = mutation({
+//   args: {
+//     title: v.string(),
+//     fileId: v.id("_storage"),
+//     // orgId: v.optional(v.string()),
+//   },
+//   async handler(ctx, args) {
+//     const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
+
+//     if (!userId) {
+//       throw new ConvexError("Not authenticated");
+//     }
+
+//     let documentId: Id<"documents">;
+
+//     // if (args.orgId) {
+//     //   const isMember = await hasOrgAccess(ctx, args.orgId);
+//     //   if (!isMember) {
+//     //     throw new ConvexError("You do not have access to this organization");
+//     //   }
+
+//       documentId = await ctx.db.insert("documents", {
+//         title: args.title,
+//         fileId: args.fileId,
+//         description: "",
+//         // orgId: args.orgId,
+//       });
+//     // } else {
+//       documentId = await ctx.db.insert("documents", {
+//         title: args.title,
+//         tokenIdentifier: userId,
+//         fileId: args.fileId,
+//         description: "",
+//       });
+//     // }
+
+//     await ctx.scheduler.runAfter(
+//       0,
+//       internal.documents.generateDocumentDescription,
+//       {
+//         fileId: args.fileId,
+//         documentId,
+//       }
+//     );
+//   },
+// });
+
+// export const generateDocumentDescription = internalAction({
+//   args: {
+//     fileId: v.id("_storage"),
+//     documentId: v.id("documents"),
+//   },
+//   async handler(ctx, args) {
+//     const file = await ctx.storage.get(args.fileId);
+
+//     if (!file) {
+//       throw new ConvexError("File not found");
+//     }
+
+//     const text = await file.text();
+
+//     const chatCompletion: OpenAI.Chat.Completions.ChatCompletion =
+//       await openai.chat.completions.create({
+//         messages: [
+//           {
+//             role: "system",
+//             content: `Here is a text file: ${text}`,
+//           },
+//           {
+//             role: "user",
+//             content: `please generate 1 sentence description for this document.`,
+//           },
+//         ],
+//         model: "gpt-3.5-turbo",
+//       });
+
+//     const description =
+//       chatCompletion.choices[0].message.content ??
+//       "could not figure out the description for this document";
+
+//     const embedding = await embed(description);
+
+//     await ctx.runMutation(internal.documents.updateDocumentDescription, {
+//       documentId: args.documentId,
+//       description: description,
+//       embedding,
+//     });
+//   },
+// });
+
+// export const updateDocumentDescription = internalMutation({
+//   args: {
+//     documentId: v.id("documents"),
+//     description: v.string(),
+//     embedding: v.array(v.float64()),
+//   },
+//   async handler(ctx, args) {
+//     await ctx.db.patch(args.documentId, {
+//       description: args.description,
+//       embedding: args.embedding,
+//     });
+//   },
+// });
+
+// export const askQuestion = action({
+//   args: {
+//     question: v.string(),
+//     documentId: v.id("documents"),
+//   },
+//   async handler(ctx, args) {
+//     const accessObj = await ctx.runQuery(
+//       internal.documents.hasAccessToDocumentQuery,
+//       {
+//         documentId: args.documentId,
+//       }
+//     );
+
+//     if (!accessObj) {
+//       throw new ConvexError("You do not have access to this document");
+//     }
+
+//     const file = await ctx.storage.get(accessObj.document.fileId);
+
+//     if (!file) {
+//       throw new ConvexError("File not found");
+//     }
+
+//     const text = await file.text();
+
+//     const chatCompletion: OpenAI.Chat.Completions.ChatCompletion =
+//       await openai.chat.completions.create({
+//         messages: [
+//           {
+//             role: "system",
+//             content: `Here is a text file: ${text}`,
+//           },
+//           {
+//             role: "user",
+//             content: `please answer this question: ${args.question}`,
+//           },
+//         ],
+//         model: "gpt-3.5-turbo",
+//       });
+
+//     await ctx.runMutation(internal.chats.createChatRecord, {
+//       documentId: args.documentId,
+//       text: args.question,
+//       isHuman: true,
+//       tokenIdentifier: accessObj.userId,
+//     });
+
+//     const response =
+//       chatCompletion.choices[0].message.content ??
+//       "could not generate a response";
+
+//     await ctx.runMutation(internal.chats.createChatRecord, {
+//       documentId: args.documentId,
+//       text: response,
+//       isHuman: false,
+//       tokenIdentifier: accessObj.userId,
+//     });
+
+//     return response;
+//   },
+// });
+
+// export const deleteDocument = mutation({
+//   args: {
+//     documentId: v.id("documents"),
+//   },
+//   async handler(ctx, args) {
+//     const accessObj = await hasAccessToDocument(ctx, args.documentId);
+
+//     if (!accessObj) {
+//       throw new ConvexError("You do not have access to this document");
+//     }
+
+//     await ctx.storage.delete(accessObj.document.fileId);
+//     await ctx.db.delete(args.documentId);
+//   },
+// })
+
+
+
+
+// import {
+//   MutationCtx,
+//   QueryCtx,
+//   action,
+//   internalAction,
+//   internalMutation,
+//   internalQuery,
+//   mutation,
+//   query,
+// } from "./_generated/server";
+// import { ConvexError, v } from "convex/values";
+// import { internal } from "./_generated/api";
+// import OpenAI from "openai";
+// import { Id } from "./_generated/dataModel";
+// import { embed } from "./notes";
+
+// const openai = new OpenAI({
+//   apiKey: process.env.OPENAI_API_KEY,
+// });
+
+// export async function hasAccessToDocument(
+//   ctx: MutationCtx | QueryCtx,
+//   documentId: Id<"documents">
+// ) {
+//   const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
+
+//   if (!userId) {
+//     return null;
+//   }
+
+//   const document = await ctx.db.get(documentId);
+
+//   if (!document) {
+//     return null;
+//   }
+
+//   // Check if the document's tokenIdentifier matches the user's ID
+//   if (document.tokenIdentifier && document.tokenIdentifier !== userId) {
+//     return null;
+//   }
+
+//   return { document, userId };
+// }
+
+// export const hasAccessToDocumentQuery = internalQuery({
+//   args: {
+//     documentId: v.id("documents"),
+//   },
+//   async handler(ctx, args) {
+//     return await hasAccessToDocument(ctx, args.documentId);
+//   },
+// });
+
+// export const generateUploadUrl = mutation(async (ctx) => {
+//   return await ctx.storage.generateUploadUrl();
+// });
+
+// export const getDocuments = query({
+//   async handler(ctx) {
+//     const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
+
+//     if (!userId) {
+//       return undefined;
+//     }
+
+//     return await ctx.db
+//       .query("documents")
+//       .withIndex("by_tokenIdentifier", (q) => q.eq("tokenIdentifier", userId))
+//       .collect();
+//   },
+// });
+
+// export const getDocument = query({
+//   args: {
+//     documentId: v.id("documents"),
+//   },
+//   async handler(ctx, args) {
+//     const accessObj = await hasAccessToDocument(ctx, args.documentId);
+
+//     if (!accessObj) {
+//       return null;
+//     }
+
+//     return {
+//       ...accessObj.document,
+//       documentUrl: await ctx.storage.getUrl(accessObj.document.fileId),
+//     };
+//   },
+// });
+
+// export const createDocument = mutation({
+//   args: {
+//     title: v.string(),
+//     fileId: v.id("_storage"),
+//   },
+//   async handler(ctx, args) {
+//     const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
+
+//     if (!userId) {
+//       throw new ConvexError("Not authenticated");
+//     }
+
+//     const documentId = await ctx.db.insert("documents", {
+//       title: args.title,
+//       tokenIdentifier: userId,
+//       fileId: args.fileId,
+//       description: "",
+//     });
+
+//     await ctx.scheduler.runAfter(
+//       0,
+//       internal.documents.generateDocumentDescription,
+//       {
+//         fileId: args.fileId,
+//         documentId,
+//       }
+//     );
+//   },
+// });
+
+// export const generateDocumentDescription = internalAction({
+//   args: {
+//     fileId: v.id("_storage"),
+//     documentId: v.id("documents"),
+//   },
+//   async handler(ctx, args) {
+//     const file = await ctx.storage.get(args.fileId);
+
+//     if (!file) {
+//       throw new ConvexError("File not found");
+//     }
+
+//     const text = await file.text();
+
+//     const chatCompletion: OpenAI.Chat.Completions.ChatCompletion =
+//       await openai.chat.completions.create({
+//         messages: [
+//           {
+//             role: "system",
+//             content: `Here is a text file: ${text}`,
+//           },
+//           {
+//             role: "user",
+//             content: `please generate 1 sentence description for this document.`,
+//           },
+//         ],
+//         model: "gpt-3.5-turbo",
+//       });
+
+//     const description =
+//       chatCompletion.choices[0].message.content ??
+//       "could not figure out the description for this document";
+
+//     const embedding = await embed(description);
+
+//     await ctx.runMutation(internal.documents.updateDocumentDescription, {
+//       documentId: args.documentId,
+//       description: description,
+//       embedding,
+//     });
+//   },
+// });
+
+// export const updateDocumentDescription = internalMutation({
+//   args: {
+//     documentId: v.id("documents"),
+//     description: v.string(),
+//     embedding: v.array(v.float64()),
+//   },
+//   async handler(ctx, args) {
+//     await ctx.db.patch(args.documentId, {
+//       description: args.description,
+//       embedding: args.embedding,
+//     });
+//   },
+// });
+
+// export const askQuestion = action({
+//   args: {
+//     question: v.string(),
+//     documentId: v.id("documents"),
+//   },
+//   async handler(ctx, args) {
+//     const accessObj = await ctx.runQuery(
+//       internal.documents.hasAccessToDocumentQuery,
+//       {
+//         documentId: args.documentId,
+//       }
+//     );
+
+//     if (!accessObj) {
+//       throw new ConvexError("You do not have access to this document");
+//     }
+
+//     const file = await ctx.storage.get(accessObj.document.fileId);
+
+//     if (!file) {
+//       throw new ConvexError("File not found");
+//     }
+
+//     const text = await file.text();
+
+//     const chatCompletion: OpenAI.Chat.Completions.ChatCompletion =
+//       await openai.chat.completions.create({
+//         messages: [
+//           {
+//             role: "system",
+//             content: `Here is a text file: ${text}`,
+//           },
+//           {
+//             role: "user",
+//             content: `please answer this question: ${args.question}`,
+//           },
+//         ],
+//         model: "gpt-3.5-turbo",
+//       });
+
+//     await ctx.runMutation(internal.chats.createChatRecord, {
+//       documentId: args.documentId,
+//       text: args.question,
+//       isHuman: true,
+//       tokenIdentifier: accessObj.userId,
+//     });
+
+//     const response =
+//       chatCompletion.choices[0].message.content ??
+//       "could not generate a response";
+
+//     await ctx.runMutation(internal.chats.createChatRecord, {
+//       documentId: args.documentId,
+//       text: response,
+//       isHuman: false,
+//       tokenIdentifier: accessObj.userId,
+//     });
+
+//     return response;
+//   },
+// });
+
+// export const deleteDocument = mutation({
+//   args: {
+//     documentId: v.id("documents"),
+//   },
+//   async handler(ctx, args) {
+//     const accessObj = await hasAccessToDocument(ctx, args.documentId);
+
+//     if (!accessObj) {
+//       throw new ConvexError("You do not have access to this document");
+//     }
+
+//     await ctx.storage.delete(accessObj.document.fileId);
+//     await ctx.db.delete(args.documentId);
+//   },
+// });
+
+
+
+
 import {
   MutationCtx,
   QueryCtx,
@@ -18,7 +592,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-
+// Helper function to check access to a document
 export async function hasAccessToDocument(
   ctx: MutationCtx | QueryCtx,
   documentId: Id<"documents">
@@ -35,16 +609,9 @@ export async function hasAccessToDocument(
     return null;
   }
 
-  if (document.orgId) {
-    const hasAccess = await hasOrgAccess(ctx, document.orgId);
-
-    if (!hasAccess) {
-      return null;
-    }
-  } else {
-    if (document.tokenIdentifier !== userId) {
-      return null;
-    }
+  // Check if the document's tokenIdentifier matches the user's ID
+  if (document.tokenIdentifier && document.tokenIdentifier !== userId) {
+    return null;
   }
 
   return { document, userId };
@@ -59,60 +626,33 @@ export const hasAccessToDocumentQuery = internalQuery({
   },
 });
 
+// Mutation to generate upload URL
 export const generateUploadUrl = mutation(async (ctx) => {
-  return await ctx.storage.generateUploadUrl();
+  try {
+    return await ctx.storage.generateUploadUrl();
+  } catch (error) {
+    console.error("Error generating upload URL:", error);
+    throw new ConvexError("Failed to generate upload URL.");
+  }
 });
 
-export const hasOrgAccess = async (
-  ctx: MutationCtx | QueryCtx,
-  orgId: string
-) => {
-  const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
-
-  if (!userId) {
-    return false;
-  }
-
-  const membership = await ctx.db
-    .query("memberships")
-    .withIndex("by_orgId_userId", (q) =>
-      q.eq("orgId", orgId).eq("userId", userId)
-    )
-    .first();
-
-  return !!membership;
-};
-
+// Query to get documents for a user
 export const getDocuments = query({
-  args: {
-    orgId: v.optional(v.string()),
-  },
-  async handler(ctx, args) {
+  async handler(ctx) {
     const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
 
     if (!userId) {
       return undefined;
     }
 
-    if (args.orgId) {
-      const isMember = await hasOrgAccess(ctx, args.orgId);
-      if (!isMember) {
-        return undefined;
-      }
-
-      return await ctx.db
-        .query("documents")
-        .withIndex("by_orgId", (q) => q.eq("orgId", args.orgId))
-        .collect();
-    } else {
-      return await ctx.db
-        .query("documents")
-        .withIndex("by_tokenIdentifier", (q) => q.eq("tokenIdentifier", userId))
-        .collect();
-    }
+    return await ctx.db
+      .query("documents")
+      .withIndex("by_tokenIdentifier", (q) => q.eq("tokenIdentifier", userId))
+      .collect();
   },
 });
 
+// Query to get a specific document
 export const getDocument = query({
   args: {
     documentId: v.id("documents"),
@@ -131,96 +671,117 @@ export const getDocument = query({
   },
 });
 
+// Mutation to create a document
 export const createDocument = mutation({
   args: {
     title: v.string(),
     fileId: v.id("_storage"),
-    orgId: v.optional(v.string()),
   },
   async handler(ctx, args) {
+    // Step 1: Log incoming arguments
+    console.log("Received arguments for createDocument:", args);
+
+    // Step 2: Check for authenticated user ID
     const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
-
     if (!userId) {
-      throw new ConvexError("Not authenticated");
+      console.error("Error: User not authenticated");
+      throw new ConvexError("User must be authenticated to create a document.");
     }
+    console.log("Authenticated user ID:", userId);
 
-    let documentId: Id<"documents">;
-
-    if (args.orgId) {
-      const isMember = await hasOrgAccess(ctx, args.orgId);
-      if (!isMember) {
-        throw new ConvexError("You do not have access to this organization");
-      }
-
-      documentId = await ctx.db.insert("documents", {
-        title: args.title,
-        fileId: args.fileId,
-        description: "",
-        orgId: args.orgId,
-      });
-    } else {
-      documentId = await ctx.db.insert("documents", {
+    // Step 3: Validate arguments
+    if (!args.title || !args.fileId) {
+      console.error("Error: Missing title or fileId arguments");
+      throw new ConvexError("Title and fileId are required to create a document.");
+    }
+    
+    try {
+      // Step 4: Attempt to insert document into database
+      console.log("Inserting document into database with title:", args.title);
+      const documentId = await ctx.db.insert("documents", {
         title: args.title,
         tokenIdentifier: userId,
         fileId: args.fileId,
         description: "",
       });
-    }
+      console.log("Document successfully inserted with ID:", documentId);
 
-    await ctx.scheduler.runAfter(
-      0,
-      internal.documents.generateDocumentDescription,
-      {
+      // Step 5: Schedule document description generation
+      console.log("Scheduling description generation for document ID:", documentId);
+      await ctx.scheduler.runAfter(
+        0,
+        internal.documents.generateDocumentDescription,
+        {
+          fileId: args.fileId,
+          documentId,
+        }
+      );
+      console.log("Description generation successfully scheduled for document ID:", documentId);
+
+    } catch (error) {
+      // Log detailed error message for diagnostics
+      console.error("Error in createDocument mutation. Arguments:", {
+        title: args.title,
         fileId: args.fileId,
-        documentId,
-      }
-    );
+      });
+      console.error("Detailed error:", error);
+      throw new ConvexError("Server error: failed to create document.");
+    }
   },
 });
 
+
+
+// Action to generate a document description
 export const generateDocumentDescription = internalAction({
   args: {
     fileId: v.id("_storage"),
     documentId: v.id("documents"),
   },
   async handler(ctx, args) {
-    const file = await ctx.storage.get(args.fileId);
+    console.log("Starting document description generation for document ID:", args.documentId);
 
+    const file = await ctx.storage.get(args.fileId);
     if (!file) {
+      console.error("File not found in storage for fileId:", args.fileId);
       throw new ConvexError("File not found");
     }
 
     const text = await file.text();
+    console.log("Retrieved file text for description generation:", text);
 
-    const chatCompletion: OpenAI.Chat.Completions.ChatCompletion =
-      await openai.chat.completions.create({
+    try {
+      const chatCompletion = await openai.chat.completions.create({
         messages: [
-          {
-            role: "system",
-            content: `Here is a text file: ${text}`,
-          },
-          {
-            role: "user",
-            content: `please generate 1 sentence description for this document.`,
-          },
+          { role: "system", content: `Here is a text file: ${text}` },
+          { role: "user", content: `Please generate a 1-sentence description for this document.` },
         ],
         model: "gpt-3.5-turbo",
       });
 
-    const description =
-      chatCompletion.choices[0].message.content ??
-      "could not figure out the description for this document";
+      const description =
+        chatCompletion.choices[0].message.content ?? "Could not generate a description for this document";
+      console.log("Generated description:", description);
 
-    const embedding = await embed(description);
+      const embedding = await embed(description);
 
-    await ctx.runMutation(internal.documents.updateDocumentDescription, {
-      documentId: args.documentId,
-      description: description,
-      embedding,
-    });
+      await ctx.runMutation(internal.documents.updateDocumentDescription, {
+        documentId: args.documentId,
+        description,
+        embedding,
+      });
+      console.log("Document description successfully updated for document ID:", args.documentId);
+
+    } catch (error) {
+      console.error("Error during description generation for document ID:", args.documentId);
+      console.error("Error details:", error);
+      throw new ConvexError("Failed to generate document description.");
+    }
   },
 });
 
+
+// Internal mutation to update document description
 export const updateDocumentDescription = internalMutation({
   args: {
     documentId: v.id("documents"),
@@ -235,6 +796,7 @@ export const updateDocumentDescription = internalMutation({
   },
 });
 
+// Action to ask a question based on the document content
 export const askQuestion = action({
   args: {
     question: v.string(),
@@ -269,7 +831,7 @@ export const askQuestion = action({
           },
           {
             role: "user",
-            content: `please answer this question: ${args.question}`,
+            content: `Please answer this question: ${args.question}`,
           },
         ],
         model: "gpt-3.5-turbo",
@@ -297,6 +859,7 @@ export const askQuestion = action({
   },
 });
 
+// Mutation to delete a document
 export const deleteDocument = mutation({
   args: {
     documentId: v.id("documents"),
@@ -308,7 +871,215 @@ export const deleteDocument = mutation({
       throw new ConvexError("You do not have access to this document");
     }
 
-    await ctx.storage.delete(accessObj.document.fileId);
-    await ctx.db.delete(args.documentId);
+    try {
+      await ctx.storage.delete(accessObj.document.fileId);
+      await ctx.db.delete(args.documentId);
+      console.log("Document deleted successfully with ID:", args.documentId);
+    } catch (error) {
+      console.error("Error deleting document:", error);
+      throw new ConvexError("Failed to delete document.");
+    }
   },
 });
+
+
+
+
+// import {
+//   MutationCtx,
+//   QueryCtx,
+//   action,
+//   internalAction,
+//   internalMutation,
+//   mutation,
+//   query,
+// } from "./_generated/server";
+// import { ConvexError, v } from "convex/values";
+// import { internal } from "./_generated/api";
+// import OpenAI from "openai";
+// import { Id } from "./_generated/dataModel";
+// import { embed } from "./notes";
+
+// const openai = new OpenAI({
+//   apiKey: process.env.OPENAI_API_KEY,
+// });
+
+// // Mutation to generate upload URL
+// export const generateUploadUrl = mutation(async (ctx) => {
+//   try {
+//     return await ctx.storage.generateUploadUrl();
+//   } catch (error) {
+//     console.error("Error generating upload URL:", error);
+//     throw new ConvexError("Failed to generate upload URL.");
+//   }
+// });
+
+// // Query to get all documents
+// export const getDocuments = query({
+//   async handler(ctx) {
+//     return await ctx.db.query("documents").collect();
+//   },
+// });
+
+// // Query to get a specific document
+// export const getDocument = query({
+//   args: {
+//     documentId: v.id("documents"),
+//   },
+//   async handler(ctx, args) {
+//     const document = await ctx.db.get(args.documentId);
+//     if (!document) return null;
+
+//     return {
+//       ...document,
+//       documentUrl: await ctx.storage.getUrl(document.fileId),
+//     };
+//   },
+// });
+
+// // Mutation to create a document
+// export const createDocument = mutation({
+//   args: {
+//     title: v.string(),
+//     fileId: v.id("_storage"),
+//   },
+//   async handler(ctx, args) {
+//     if (!args.title || !args.fileId) {
+//       console.error("Error: Missing title or fileId arguments");
+//       throw new ConvexError("Title and fileId are required to create a document.");
+//     }
+
+//     try {
+//       const documentId = await ctx.db.insert("documents", {
+//         title: args.title,
+//         fileId: args.fileId,
+//         description: "",
+//       });
+
+//       await ctx.scheduler.runAfter(
+//         0,
+//         internal.documents.generateDocumentDescription,
+//         {
+//           fileId: args.fileId,
+//           documentId,
+//         }
+//       );
+//     } catch (error) {
+//       console.error("Error in createDocument mutation:", error);
+//       throw new ConvexError("Server error: failed to create document.");
+//     }
+//   },
+// });
+
+// // Action to generate a document description
+// export const generateDocumentDescription = internalAction({
+//   args: {
+//     fileId: v.id("_storage"),
+//     documentId: v.id("documents"),
+//   },
+//   async handler(ctx, args) {
+//     const file = await ctx.storage.get(args.fileId);
+//     if (!file) {
+//       console.error("File not found in storage for fileId:", args.fileId);
+//       throw new ConvexError("File not found");
+//     }
+
+//     const text = await file.text();
+
+//     try {
+//       const chatCompletion = await openai.chat.completions.create({
+//         messages: [
+//           { role: "system", content: `Here is a text file: ${text}` },
+//           { role: "user", content: `Please generate a 1-sentence description for this document.` },
+//         ],
+//         model: "gpt-3.5-turbo",
+//       });
+
+//       const description =
+//         chatCompletion.choices[0].message.content ?? "Could not generate a description for this document";
+//       const embedding = await embed(description);
+
+//       await ctx.runMutation(internal.documents.updateDocumentDescription, {
+//         documentId: args.documentId,
+//         description,
+//         embedding,
+//       });
+//     } catch (error) {
+//       console.error("Error during description generation:", error);
+//       throw new ConvexError("Failed to generate document description.");
+//     }
+//   },
+// });
+
+// // Internal mutation to update document description
+// export const updateDocumentDescription = internalMutation({
+//   args: {
+//     documentId: v.id("documents"),
+//     description: v.string(),
+//     embedding: v.array(v.float64()),
+//   },
+//   async handler(ctx, args) {
+//     await ctx.db.patch(args.documentId, {
+//       description: args.description,
+//       embedding: args.embedding,
+//     });
+//   },
+// });
+
+// // Action to ask a question based on the document content
+// export const askQuestion = action({
+//   args: {
+//     question: v.string(),
+//     documentId: v.id("documents"),
+//   },
+//   async handler(ctx, args) {
+//     const document = await ctx.db.get(args.documentId);
+//     if (!document) {
+//       throw new ConvexError("Document not found");
+//     }
+
+//     const file = await ctx.storage.get(document.fileId);
+//     if (!file) {
+//       throw new ConvexError("File not found");
+//     }
+
+//     const text = await file.text();
+
+//     const chatCompletion = await openai.chat.completions.create({
+//       messages: [
+//         { role: "system", content: `Here is a text file: ${text}` },
+//         { role: "user", content: `Please answer this question: ${args.question}` },
+//       ],
+//       model: "gpt-3.5-turbo",
+//     });
+
+//     return chatCompletion.choices[0].message.content ?? "Could not generate a response";
+//   },
+// });
+
+// // Mutation to delete a document
+// export const deleteDocument = mutation({
+//   args: {
+//     documentId: v.id("documents"),
+//   },
+//   async handler(ctx, args) {
+//     const document = await ctx.db.get(args.documentId);
+
+//     if (!document) {
+//       throw new ConvexError("Document not found");
+//     }
+
+//     try {
+//       await ctx.storage.delete(document.fileId);
+//       await ctx.db.delete(args.documentId);
+//       console.log("Document deleted successfully with ID:", args.documentId);
+//     } catch (error) {
+//       console.error("Error deleting document:", error);
+//       throw new ConvexError("Failed to delete document.");
+//     }
+//   },
+// });
+
+
+
+
