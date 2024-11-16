@@ -357,23 +357,33 @@
 //   }
 // }
 
-import { ConvexError, v } from "convex/values";
-import {
-  MutationCtx,
-  QueryCtx,
-  internalAction,
-  internalMutation,
-  mutation,
-  query,
-} from "./_generated/server";
+
+
+// import { ConvexError, v } from "convex/values";
+// import {
+//   MutationCtx,
+//   QueryCtx,
+//   internalAction,
+//   internalMutation,
+//   mutation,
+//   query,
+// } from "./_generated/server";
+// import OpenAI from "openai";
+// import { internal } from "./_generated/api";
+// import { Doc, Id } from "./_generated/dataModel";
+
+
+
+import { v } from "convex/values";
+import { mutation, query, internalAction, internalMutation } from "./_generated/server";
 import OpenAI from "openai";
 import { internal } from "./_generated/api";
-import { Doc, Id } from "./_generated/dataModel";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// Query to get a specific note by its ID
 export const getNote = query({
   args: {
     noteId: v.id("notes"),
@@ -384,13 +394,16 @@ export const getNote = query({
   },
 });
 
+// Query to get all notes
 export const getNotes = query({
+  args: {},
   async handler(ctx) {
     const notes = await ctx.db.query("notes").order("desc").collect();
     return notes;
   },
 });
 
+// Function to create an embedding for a given text using OpenAI API
 export async function embed(text: string) {
   const embedding = await openai.embeddings.create({
     model: "text-embedding-ada-002",
@@ -399,10 +412,11 @@ export async function embed(text: string) {
   return embedding.data[0].embedding;
 }
 
+// Internal mutation to set the embedding of a note
 export const setNoteEmbedding = internalMutation({
   args: {
     noteId: v.id("notes"),
-    embedding: v.array(v.number()),
+    embedding: v.array(v.float64()),
   },
   async handler(ctx, args) {
     await ctx.db.patch(args.noteId, {
@@ -411,6 +425,7 @@ export const setNoteEmbedding = internalMutation({
   },
 });
 
+// Internal action to create and set an embedding for a note
 export const createNoteEmbedding = internalAction({
   args: {
     noteId: v.id("notes"),
@@ -418,7 +433,6 @@ export const createNoteEmbedding = internalAction({
   },
   async handler(ctx, args) {
     const embedding = await embed(args.text);
-
     await ctx.runMutation(internal.notes.setNoteEmbedding, {
       noteId: args.noteId,
       embedding,
@@ -426,46 +440,27 @@ export const createNoteEmbedding = internalAction({
   },
 });
 
-// export const createNote = mutation({
-//   args: {
-//     text: v.string(),
-//   },
-//   async handler(ctx, args) {
-//     const noteId = await ctx.db.insert("notes", {
-//       text: args.text,
-//     });
-
-//     await ctx.scheduler.runAfter(0, internal.notes.createNoteEmbedding, {
-//       noteId,
-//       text: args.text,
-//     });
-//   },
-// });
+// Mutation to create a new note
 export const createNote = mutation({
   args: {
     text: v.string(),
   },
   async handler(ctx, args) {
-    try {
-      console.log("Inserting note into database...");
-      const noteId = await ctx.db.insert("notes", {
-        text: args.text,
-      });
-      console.log("Note inserted with ID:", noteId);
+    // Use a placeholder for tokenIdentifier since we're skipping user authentication
+    const noteId = await ctx.db.insert("notes", {
+      text: args.text,
+      tokenIdentifier: "anonymous", // Placeholder value for tokenIdentifier
+    });
 
-      console.log("Scheduling embedding creation...");
-      await ctx.scheduler.runAfter(0, internal.notes.createNoteEmbedding, {
-        noteId,
-        text: args.text,
-      });
-      console.log("Embedding scheduled.");
-    } catch (error) {
-      console.error("Error during note creation:", error);
-      throw new ConvexError("An error occurred while creating the note.");
-    }
+    // Schedule the creation of the embedding asynchronously
+    await ctx.scheduler.runAfter(0, internal.notes.createNoteEmbedding, {
+      noteId,
+      text: args.text,
+    });
   },
 });
 
+// Mutation to delete a note by its ID
 export const deleteNote = mutation({
   args: {
     noteId: v.id("notes"),
@@ -474,9 +469,10 @@ export const deleteNote = mutation({
     const note = await ctx.db.get(args.noteId);
 
     if (!note) {
-      throw new ConvexError("Note not found");
+      throw new Error("Note not found");
     }
 
+    // Remove the note from the database
     await ctx.db.delete(args.noteId);
   },
 });
