@@ -940,7 +940,7 @@ export default function UploadDocumentForm({
       console.log("Document created successfully with ID:", documentId);
       onUpload();
     } catch (error) {
-      console.error("Error in onSubmit:", error.message);
+      console.error("Error in onSubmit:", error);
     }
   }
 

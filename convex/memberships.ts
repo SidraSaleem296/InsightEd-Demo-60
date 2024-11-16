@@ -44,53 +44,113 @@
 // });
 
 
+// import { v } from "convex/values";
+// import { internalMutation, internalQuery } from "./_generated/server";
+
+// // Adds a user to the "memberships" collection
+// export const addUser = internalMutation({
+//   args: {
+//     userId: v.string(),
+//   },
+//   async handler(ctx, args) {
+//     await ctx.db.insert("memberships", {
+//       userId: args.userId,
+//     });
+//   },
+// });
+
+// // Removes a user from the "memberships" collection
+// export const removeUser = internalMutation({
+//   args: {
+//     userId: v.string(),
+//   },
+//   async handler(ctx, args) {
+//     const membership = await ctx.db
+//       .query("memberships")
+//       .withIndex("by_userId", (q) =>
+//         q.eq("userId", args.userId)
+//       )
+//       .first();
+
+//     if (membership) {
+//       await ctx.db.delete(membership._id);
+//     }
+//   },
+// });
+
+// // Query to check if a user has access (if required for other logic)
+// export const hasUserAccessQuery = internalQuery({
+//   args: {
+//     userId: v.string(),
+//   },
+//   async handler(ctx, args) {
+//     const membership = await ctx.db
+//       .query("memberships")
+//       .withIndex("by_userId", (q) =>
+//         q.eq("userId", args.userId)
+//       )
+//       .first();
+
+//     return !!membership;
+//   },
+// });
+
+
 import { v } from "convex/values";
 import { internalMutation, internalQuery } from "./_generated/server";
 
-// Adds a user to the "memberships" collection
-export const addUser = internalMutation({
+// Adds a document to the "documents" collection
+export const addDocument = internalMutation({
   args: {
-    userId: v.string(),
+    title: v.string(),
+    description: v.optional(v.string()),
+    tokenIdentifier: v.optional(v.string()),
+    embedding: v.optional(v.array(v.float64())),
+    fileId: v.id("_storage"),
   },
   async handler(ctx, args) {
-    await ctx.db.insert("memberships", {
-      userId: args.userId,
+    await ctx.db.insert("documents", {
+      title: args.title,
+      description: args.description,
+      tokenIdentifier: args.tokenIdentifier,
+      embedding: args.embedding,
+      fileId: args.fileId,
     });
   },
 });
 
-// Removes a user from the "memberships" collection
-export const removeUser = internalMutation({
+// Removes a document from the "documents" collection based on the token identifier
+export const removeDocument = internalMutation({
   args: {
-    userId: v.string(),
+    tokenIdentifier: v.string(),
   },
   async handler(ctx, args) {
-    const membership = await ctx.db
-      .query("memberships")
-      .withIndex("by_userId", (q) =>
-        q.eq("userId", args.userId)
+    const document = await ctx.db
+      .query("documents")
+      .withIndex("by_tokenIdentifier", (q) =>
+        q.eq("tokenIdentifier", args.tokenIdentifier)
       )
       .first();
 
-    if (membership) {
-      await ctx.db.delete(membership._id);
+    if (document) {
+      await ctx.db.delete(document._id);
     }
   },
 });
 
-// Query to check if a user has access (if required for other logic)
-export const hasUserAccessQuery = internalQuery({
+// Query to check if a document with a given token identifier exists
+export const hasDocumentQuery = internalQuery({
   args: {
-    userId: v.string(),
+    tokenIdentifier: v.string(),
   },
   async handler(ctx, args) {
-    const membership = await ctx.db
-      .query("memberships")
-      .withIndex("by_userId", (q) =>
-        q.eq("userId", args.userId)
+    const document = await ctx.db
+      .query("documents")
+      .withIndex("by_tokenIdentifier", (q) =>
+        q.eq("tokenIdentifier", args.tokenIdentifier)
       )
       .first();
 
-    return !!membership;
+    return !!document;
   },
 });
