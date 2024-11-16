@@ -1,4 +1,4 @@
-/app/social-platform/page.tsx
+// /app/social-platform/page.tsx
 
 // Add at the top of the component file if it's a Client Component
 "use client";
