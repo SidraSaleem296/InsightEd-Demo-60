@@ -63,6 +63,7 @@ model User {
   posts             Post[]
   comments          Comment[]
   notifications     Notifications[]
+  activities        Activity[] 
 }
 
 
@@ -207,3 +208,24 @@ model Notifications {
   user User @relation(fields: [userId], references: [id], onDelete:Cascade)
 }
 
+model Activity {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  name        String
+  description String?
+  colorCode   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activityLogs ActivityLog[]
+}
+
+model ActivityLog {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  activityId  String   @db.ObjectId
+  date        DateTime @default(now())
+  count       Int      @default(1)
+
+  activity    Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+}

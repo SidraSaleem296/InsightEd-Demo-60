@@ -568,7 +568,7 @@ export function SidebarMenu() {
 
             name: "Dashboard",
             icon: <Home size={15} className="mr-2" style={{ color: 'grey' }} />,
-            href: "/dashboard"
+            href: "/none"
         },
         {
             name: "Courses",
@@ -578,6 +578,11 @@ export function SidebarMenu() {
                     name: "Create",
                     icon: <Calendar size={15} className="mr-2" />,
                     href: "/create",
+                },
+                {
+                    name: "Lesson Planning",
+                    icon: <Calendar size={15} className="mr-2" />,
+                    href: "/lesson-planning",
                 },
                 {
                     name: "Quiz",
@@ -607,45 +612,48 @@ export function SidebarMenu() {
             ],
         },
         {
-            name: "Lesson Planning",
-            icon: <Calendar size={15} className="mr-2" />,
-            href: "/lesson-planning",
-        },
-        {
-            name: "Profile",
-            icon: <User size={15} className="mr-2" />,
-            href: "/profile",
-        },
-        {
-            name: "Notifications",
-            icon: <Bell size={15} className="mr-2" />,
-            href: "/notifications",
+
+            name: "Habit Tracker",
+            icon: <Home size={15} className="mr-2" style={{ color: 'grey' }} />,
+            submenu:[
+                {
+                    name: "Habit Analysis",
+                    icon: <Bell size={15} className="mr-2" />,
+                    href: "/dashboard",
+                },
+                {
+                    name: "Activities",
+                    icon: <Bell size={15} className="mr-2" />,
+                    href: "/dashboard/activities/",
+                },
+
+            ]
         },
         {
             name: "Resource Finder",
             icon: <Bell size={15} className="mr-2" />,
-            href: "/search",
+            href: "/LLMSearchEngine",
         },
         {
             name: "Report Generation",
             icon: <FileText size={15} className="mr-2" />,
             href: "/history",
         },
-        {
-            name: "History",
-            icon: <FileText size={15} className="mr-2" />,
-            href: "/history",
-        },
-        {
-            name: "Search",
-            icon: <Users size={15} className="mr-2" />,
-            href: "/LLMSearchEngine",
-        },
 
         {
             name: "Social Platform",
             icon: <Globe size={15} className="mr-2" />,
             href: "/social-platform",
+        },
+        {
+            name: "Notifications",
+            icon: <User size={15} className="mr-2" />,
+            href: "/notifications",
+        },
+        {
+            name: "Profile",
+            icon: <User size={15} className="mr-2" />,
+            href: "/profile",
         },
         {
             name: "Settings",
