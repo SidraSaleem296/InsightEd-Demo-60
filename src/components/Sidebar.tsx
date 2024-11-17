@@ -539,169 +539,6 @@
 
 //Working fine
 
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { ChevronDownIcon, Home, Book, Calendar, User, Bell, FileText, Users, Globe, Settings, Clipboard } from "lucide-react";
-import Link from "next/link";
-import * as React from "react";
-
-type Menu = {
-    name: string;
-    icon: React.ReactNode;
-    submenu?: Submenu[];
-    href?: string;
-}
-
-type Submenu = {
-    name: string;
-    icon: React.ReactNode;
-    href: string;
-}
-
-export function SidebarMenu() {
-    const menus: Menu[] = [
-
-        {
-            // name: "Dashboard",
-            // icon: <Home size={15} className="mr-2" />,
-            // href: "/dashboard",
-
-            name: "Dashboard",
-            icon: <Home size={15} className="mr-2" style={{ color: 'grey' }} />,
-            href: "/none"
-        },
-        {
-            name: "Courses",
-            icon: <Book size={15} className="mr-2" />,
-            submenu: [
-                {
-                    name: "Create",
-                    icon: <Calendar size={15} className="mr-2" />,
-                    href: "/create",
-                },
-                {
-                    name: "Lesson Planning",
-                    icon: <Calendar size={15} className="mr-2" />,
-                    href: "/lesson-planning",
-                },
-                {
-                    name: "Quiz",
-                    icon: <Clipboard size={15} className="mr-2" />,
-                    href: "/QuizDashboard",
-                },
-                {
-                    name: "Gallery",
-                    icon: <Calendar size={15} className="mr-2" />,
-                    href: "/gallery",
-                },
-                {
-                    name: "Documents",
-                    icon: <Calendar size={15} className="mr-2" />,
-                    href: "/Docs/documents",
-                },
-                {
-                    name: "Notes",
-                    icon: <Clipboard size={15} className="mr-2" />,
-                    href: "/Docs/notes",
-                },
-                {
-                    name: "Chat",
-                    icon: <Calendar size={15} className="mr-2" />,
-                    href: "/Docs/search",
-                }
-            ],
-        },
-        {
-
-            name: "Habit Tracker",
-            icon: <Home size={15} className="mr-2" style={{ color: 'grey' }} />,
-            submenu:[
-                {
-                    name: "Habit Analysis",
-                    icon: <Bell size={15} className="mr-2" />,
-                    href: "/dashboard",
-                },
-                {
-                    name: "Activities",
-                    icon: <Bell size={15} className="mr-2" />,
-                    href: "/dashboard/activities/",
-                },
-
-            ]
-        },
-        {
-            name: "Resource Finder",
-            icon: <Bell size={15} className="mr-2" />,
-            href: "/LLMSearchEngine",
-        },
-        {
-            name: "Report Generation",
-            icon: <FileText size={15} className="mr-2" />,
-            href: "/history",
-        },
-
-        {
-            name: "Social Platform",
-            icon: <Globe size={15} className="mr-2" />,
-            href: "/social-platform",
-        },
-        {
-            name: "Notifications",
-            icon: <User size={15} className="mr-2" />,
-            href: "/notifications",
-        },
-        {
-            name: "Profile",
-            icon: <User size={15} className="mr-2" />,
-            href: "/profile",
-        },
-        {
-            name: "Settings",
-            icon: <Settings size={15} className="mr-2" />,
-            href: "/settings",
-        },
-    ];
-
-    return (
-        <div className="h-screen w-64 bg-gray-200 dark:bg-gray-800 fixed">
-            <ScrollArea className="h-full rounded-md overflow-y-auto">
-                <div className="px-4 mt-5">
-                    {menus.map((menu) => (
-                        <div key={menu.name} className="my-2">
-                            {menu.submenu ? (
-                                <Accordion type="single" collapsible>
-                                    <AccordionItem value={menu.name}>
-                                        <AccordionTrigger className="flex items-center p-4 hover:bg-primary dark:hover:bg-primary dark:hover:text-primary-foreground hover:text-primary-foreground rounded-md">
-                                            <div className="w-10">{menu.icon}</div>
-                                            {menu.name}
-                                            <ChevronDownIcon className="ml-auto" />
-                                        </AccordionTrigger>
-                                        <AccordionContent>
-                                            {menu.submenu.map((submenu) => (
-                                                <Link key={submenu.name} href={submenu.href} className="flex text-xs h-10 bg-background dark:bg-background my-2 items-center pl-10 hover:bg-primary dark:hover:bg-primary dark:hover:text-primary-foreground hover:text-primary-foreground rounded-md">
-                                                    <div className="w-6">{submenu.icon}</div>
-                                                    {submenu.name}
-                                                </Link>
-                                            ))}
-                                        </AccordionContent>
-                                    </AccordionItem>
-                                </Accordion>
-                            ) : (
-                                <Link href={menu.href || '/default-path'} className="flex text-xs h-10 bg-background dark:bg-background my-2 items-center p-4 hover:bg-primary dark:hover:bg-primary dark:hover:text-primary-foreground hover:text-primary-foreground rounded-md">
-                                    <div className="w-6">{menu.icon}</div>
-                                    {menu.name}
-                                </Link>
-                            )}
-                        </div>
-                    ))}
-                </div>
-            </ScrollArea>
-        </div>
-    );
-}
-
-
-
 // import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 // import { ScrollArea } from "@/components/ui/scroll-area";
 // import { ChevronDownIcon, Home, Book, Calendar, User, Bell, FileText, Users, Globe, Settings, Clipboard } from "lucide-react";
@@ -721,16 +558,17 @@ export function SidebarMenu() {
 //     href: string;
 // }
 
-// type SidebarMenuProps = {
-//     gameId: string; // Add gameId as a prop to the SidebarMenu
-// }
-
-// export function SidebarMenu({ gameId }: SidebarMenuProps) {
+// export function SidebarMenu() {
 //     const menus: Menu[] = [
+
 //         {
+//             // name: "Dashboard",
+//             // icon: <Home size={15} className="mr-2" />,
+//             // href: "/dashboard",
+
 //             name: "Dashboard",
 //             icon: <Home size={15} className="mr-2" style={{ color: 'grey' }} />,
-//             href: "/dashboard"
+//             href: "/none"
 //         },
 //         {
 //             name: "Courses",
@@ -742,6 +580,11 @@ export function SidebarMenu() {
 //                     href: "/create",
 //                 },
 //                 {
+//                     name: "Lesson Planning",
+//                     icon: <Calendar size={15} className="mr-2" />,
+//                     href: "/lesson-planning",
+//                 },
+//                 {
 //                     name: "Quiz",
 //                     icon: <Clipboard size={15} className="mr-2" />,
 //                     href: "/QuizDashboard",
@@ -750,49 +593,67 @@ export function SidebarMenu() {
 //                     name: "Gallery",
 //                     icon: <Calendar size={15} className="mr-2" />,
 //                     href: "/gallery",
+//                 },
+//                 {
+//                     name: "Documents",
+//                     icon: <Calendar size={15} className="mr-2" />,
+//                     href: "/Docs/documents",
+//                 },
+//                 {
+//                     name: "Notes",
+//                     icon: <Clipboard size={15} className="mr-2" />,
+//                     href: "/Docs/notes",
+//                 },
+//                 {
+//                     name: "Chat",
+//                     icon: <Calendar size={15} className="mr-2" />,
+//                     href: "/Docs/search",
 //                 }
 //             ],
 //         },
 //         {
-//             name: "Lesson Planning",
-//             icon: <Calendar size={15} className="mr-2" />,
-//             href: "/lesson-planning",
-//         },
-//         {
-//             name: "Profile",
-//             icon: <User size={15} className="mr-2" />,
-//             href: "/profile",
-//         },
-//         {
-//             name: "Notifications",
-//             icon: <Bell size={15} className="mr-2" />,
-//             href: "/notifications",
+
+//             name: "Habit Tracker",
+//             icon: <Home size={15} className="mr-2" style={{ color: 'grey' }} />,
+//             submenu:[
+//                 {
+//                     name: "Habit Analysis",
+//                     icon: <Bell size={15} className="mr-2" />,
+//                     href: "/dashboard",
+//                 },
+//                 {
+//                     name: "Activities",
+//                     icon: <Bell size={15} className="mr-2" />,
+//                     href: "/dashboard/activities/",
+//                 },
+
+//             ]
 //         },
 //         {
 //             name: "Resource Finder",
 //             icon: <Bell size={15} className="mr-2" />,
-//             href: "/search",
+//             href: "/LLMSearchEngine",
 //         },
 //         {
-//             name: "History",
+//             name: "Report Generation",
 //             icon: <FileText size={15} className="mr-2" />,
 //             href: "/history",
-//         },
-//         {
-//             name: "Documents",
-//             icon: <Users size={15} className="mr-2" />,
-//             href: "/Docs/documents",
-//         },
-//         {
-//             name: "Search",
-//             icon: <Users size={15} className="mr-2" />,
-//             href: "/LLMSearchEngine",
 //         },
 
 //         {
 //             name: "Social Platform",
 //             icon: <Globe size={15} className="mr-2" />,
 //             href: "/social-platform",
+//         },
+//         {
+//             name: "Notifications",
+//             icon: <User size={15} className="mr-2" />,
+//             href: "/notifications",
+//         },
+//         {
+//             name: "Profile",
+//             icon: <User size={15} className="mr-2" />,
+//             href: "/profile",
 //         },
 //         {
 //             name: "Settings",
@@ -838,3 +699,181 @@ export function SidebarMenu() {
 //         </div>
 //     );
 // }
+
+
+
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  ChevronDownIcon,
+  Home,
+  Book,
+  Calendar,
+  Clipboard,
+  Image,
+  FileText,
+  MessageSquare,
+  TrendingUp,
+  Activity,
+  Search,
+  Globe,
+  Bell,
+  User,
+  Settings,
+} from "lucide-react";
+import Link from "next/link";
+import * as React from "react";
+
+type Menu = {
+  name: string;
+  icon: React.ReactNode;
+  submenu?: Submenu[];
+  href?: string;
+};
+
+type Submenu = {
+  name: string;
+  icon: React.ReactNode;
+  href: string;
+};
+
+export function SidebarMenu() {
+  const menus: Menu[] = [
+    {
+      name: "Dashboard",
+      icon: <Home size={15} className="mr-2" style={{ color: "grey" }} />,
+      href: "/dashboard",
+    },
+    {
+      name: "Courses",
+      icon: <Book size={15} className="mr-2" />,
+      submenu: [
+        {
+          name: "Create",
+          icon: <Calendar size={15} className="mr-2" />,
+          href: "/create",
+        },
+        {
+          name: "Lesson Planning",
+          icon: <Calendar size={15} className="mr-2" />,
+          href: "/lesson-planning",
+        },
+        {
+          name: "Quiz",
+          icon: <Clipboard size={15} className="mr-2" />,
+          href: "/QuizDashboard",
+        },
+        {
+          name: "Gallery",
+          icon: <Image size={15} className="mr-2" />,
+          href: "/gallery",
+        },
+        {
+          name: "Documents",
+          icon: <FileText size={15} className="mr-2" />,
+          href: "/Docs/documents",
+        },
+        {
+          name: "Notes",
+          icon: <Clipboard size={15} className="mr-2" />,
+          href: "/Docs/notes",
+        },
+        {
+          name: "Chat",
+          icon: <MessageSquare size={15} className="mr-2" />,
+          href: "/Docs/search",
+        },
+      ],
+    },
+    {
+      name: "Habit Tracker",
+      icon: <TrendingUp size={15} className="mr-2" style={{ color: "grey" }} />,
+      submenu: [
+        {
+          name: "Habit Analysis",
+          icon: <TrendingUp size={15} className="mr-2" />,
+          href: "/dashboard",
+        },
+        {
+          name: "Activities",
+          icon: <Activity size={15} className="mr-2" />,
+          href: "/dashboard/activities/",
+        },
+      ],
+    },
+    {
+      name: "Resource Finder",
+      icon: <Search size={15} className="mr-2" />,
+      href: "/LLMSearchEngine",
+    },
+    {
+      name: "Report Generation",
+      icon: <FileText size={15} className="mr-2" />,
+      href: "/history",
+    },
+    {
+      name: "Social Platform",
+      icon: <Globe size={15} className="mr-2" />,
+      href: "/social-platform",
+    },
+    {
+      name: "Notifications",
+      icon: <Bell size={15} className="mr-2" />,
+      href: "/notifications",
+    },
+    {
+      name: "Profile",
+      icon: <User size={15} className="mr-2" />,
+      href: "/profile",
+    },
+    {
+      name: "Settings",
+      icon: <Settings size={15} className="mr-2" />,
+      href: "/settings",
+    },
+  ];
+
+  return (
+    <div className="h-screen w-64 bg-gray-200 dark:bg-gray-800 fixed">
+      <ScrollArea className="h-full rounded-md overflow-y-auto">
+        <div className="px-4 mt-5">
+          {menus.map((menu) => (
+            <div key={menu.name} className="my-2">
+              {menu.submenu ? (
+                <Accordion type="single" collapsible>
+                  <AccordionItem value={menu.name}>
+                    <AccordionTrigger className="flex items-center p-4 hover:bg-primary dark:hover:bg-primary dark:hover:text-primary-foreground hover:text-primary-foreground rounded-md">
+                      <div className="w-10">{menu.icon}</div>
+                      {menu.name}
+                      <ChevronDownIcon className="ml-auto" />
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      {menu.submenu.map((submenu) => (
+                        <Link
+                          key={submenu.name}
+                          href={submenu.href}
+                          className="flex text-xs h-10 bg-background dark:bg-background my-2 items-center pl-10 hover:bg-primary dark:hover:bg-primary dark:hover:text-primary-foreground hover:text-primary-foreground rounded-md"
+                        >
+                          <div className="w-6">{submenu.icon}</div>
+                          {submenu.name}
+                        </Link>
+                      ))}
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              ) : (
+                <Link
+                  href={menu.href || "/default-path"}
+                  className="flex text-xs h-10 bg-background dark:bg-background my-2 items-center p-4 hover:bg-primary dark:hover:bg-primary dark:hover:text-primary-foreground hover:text-primary-foreground rounded-md"
+                >
+                  <div className="w-6">{menu.icon}</div>
+                  {menu.name}
+                </Link>
+              )}
+            </div>
+          ))}
+        </div>
+      </ScrollArea>
+    </div>
+  );
+}
