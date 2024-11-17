@@ -11,7 +11,7 @@ datasource db {
 
 // Account Model
 model Account {
-  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
   userId            String
   type              String
   provider          String
@@ -23,7 +23,9 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt         DateTime @default(now())    // Add this line
+  updatedAt         DateTime @updatedAt         // Add this line
 
   @@unique([provider, providerAccountId])
   @@index([userId], name: "userId")
