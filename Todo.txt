@@ -1,0 +1,18 @@
+Add Course Selection Dropdown:
+
+A dropdown menu where users select a course before they ask any query.
+The chatbot will then limit its scope to the selected course.
+Out-of-Scope Response:
+
+If the user asks a question unrelated to the selected course, the chatbot will respond by saying, "This query is out of scope for this course."
+Save Chat as a Bookmark:
+
+Include a button to bookmark/save the chat for later access.
+New Chat Functionality:
+
+A button to start a new chat session.
+
+
+Add the Big Brain Code and set it by watching a youtube channel and then implement in Gitpod and after that in project
+
+Fix if there is time, Admin panel , it's simple data management 

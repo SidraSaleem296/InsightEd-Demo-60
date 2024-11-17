@@ -30,6 +30,7 @@ const QuizDashboard = async (props: Props) => {
       <div className="grid gap-4 mt-4 md:grid-cols-2">
         <QuizMeCard />
       </div>
+
       <div className="grid gap-4 mt-4 md:grid-cols-2 lg:grid-cols-7">
         {/* <HotTopicsCard /> */}
         <RecentActivityCard />
