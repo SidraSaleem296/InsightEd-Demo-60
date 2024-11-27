@@ -723,20 +723,17 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
-
 type Menu = {
   name: string;
   icon: React.ReactNode;
   submenu?: Submenu[];
   href?: string;
 };
-
 type Submenu = {
   name: string;
   icon: React.ReactNode;
   href: string;
 };
-
 export function SidebarMenu() {
   const menus: Menu[] = [
     {
@@ -769,6 +766,11 @@ export function SidebarMenu() {
           href: "/gallery",
         },
         {
+            name: "Course Chat",
+            icon: <MessageSquare size={15} className="mr-2" />,
+            href: "/chatbot",
+          },
+        {
           name: "Documents",
           icon: <FileText size={15} className="mr-2" />,
           href: "/Docs/documents",
@@ -779,7 +781,7 @@ export function SidebarMenu() {
           href: "/Docs/notes",
         },
         {
-          name: "Chat",
+          name: "Doc Search",
           icon: <MessageSquare size={15} className="mr-2" />,
           href: "/Docs/search",
         },
@@ -832,7 +834,6 @@ export function SidebarMenu() {
       href: "/settings",
     },
   ];
-
   return (
     <div className="h-screen w-64 bg-gray-200 dark:bg-gray-800 fixed">
       <ScrollArea className="h-full rounded-md overflow-y-auto">
