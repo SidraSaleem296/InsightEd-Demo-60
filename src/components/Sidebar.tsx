@@ -701,7 +701,7 @@
 // }
 
 "use client"
-
+import { useState } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -720,6 +720,8 @@ import {
   Bell,
   User,
   Settings,
+  ChevronLeftIcon,
+  ChevronRightIcon,
 } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
@@ -739,6 +741,12 @@ type Submenu = {
 };
 
 export function SidebarMenu() {
+  const [isCollapsed, setIsCollapsed] = useState(false); // State to manage sidebar visibility
+
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed); // Toggle sidebar state
+  };
+
   const [userId, setUserId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
@@ -854,46 +862,70 @@ export function SidebarMenu() {
   ];
 
   return (
-    <div className="h-screen w-64 bg-gray-200 dark:bg-gray-800 fixed">
-      <ScrollArea className="h-full rounded-md overflow-y-auto">
-        <div className="px-4 mt-5">
-          {menus.map((menu) => (
-            <div key={menu.name} className="my-2">
-              {menu.submenu ? (
-                <Accordion type="single" collapsible>
-                  <AccordionItem value={menu.name}>
-                    <AccordionTrigger className="flex items-center p-4 hover:bg-primary dark:hover:bg-primary dark:hover:text-primary-foreground hover:text-primary-foreground rounded-md">
-                      <div className="w-10">{menu.icon}</div>
-                      {menu.name}
-                      <ChevronDownIcon className="ml-auto" />
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      {menu.submenu.map((submenu) => (
-                        <Link
-                          key={submenu.name}
-                          href={submenu.href}
-                          className="flex text-xs h-10 bg-background dark:bg-background my-2 items-center pl-10 hover:bg-primary dark:hover:bg-primary dark:hover:text-primary-foreground hover:text-primary-foreground rounded-md"
-                        >
-                          <div className="w-6">{submenu.icon}</div>
-                          {submenu.name}
-                        </Link>
-                      ))}
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              ) : (
-                <Link
-                  href={menu.href || "/default-path"}
-                  className="flex text-xs h-10 bg-background dark:bg-background my-2 items-center p-4 hover:bg-primary dark:hover:bg-primary dark:hover:text-primary-foreground hover:text-primary-foreground rounded-md"
+<div
+  className={`h-screen fixed transition-all duration-300 ${
+    isCollapsed ? "w-16 bg-gray-200 dark:bg-gray-800" : "w-64 bg-gray-200 dark:bg-gray-800"
+  }`}
+>
+  <ScrollArea className="h-full rounded-md overflow-y-auto">
+    {/* Sidebar Content */}
+    <div className="px-4 mt-5">
+      {menus.map((menu) => (
+        <div key={menu.name} className="my-2">
+          {menu.submenu ? (
+            <Accordion type="single" collapsible>
+              <AccordionItem value={menu.name}>
+                <AccordionTrigger
+                  className={`flex items-center p-4 hover:bg-primary dark:hover:bg-primary dark:hover:text-primary-foreground hover:text-primary-foreground rounded-md ${
+                    isCollapsed ? "justify-center" : ""
+                  }`}
                 >
                   <div className="w-6">{menu.icon}</div>
-                  {menu.name}
-                </Link>
-              )}
-            </div>
-          ))}
+                  {!isCollapsed && (
+                    <>
+                      {menu.name}
+                      <ChevronDownIcon className="ml-auto" />
+                    </>
+                  )}
+                </AccordionTrigger>
+                <AccordionContent>
+                  {menu.submenu.map((submenu) => (
+                    <Link
+                      key={submenu.name}
+                      href={submenu.href}
+                      className="flex text-xs h-10 bg-background dark:bg-background my-2 items-center pl-10 hover:bg-primary dark:hover:bg-primary dark:hover:text-primary-foreground hover:text-primary-foreground rounded-md"
+                    >
+                      <div className="w-6">{submenu.icon}</div>
+                      {!isCollapsed && submenu.name}
+                    </Link>
+                  ))}
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          ) : (
+            <Link
+              href={menu.href || "/default-path"}
+              className={`flex text-xs h-10 bg-background dark:bg-background my-2 items-center p-4 hover:bg-primary dark:hover:bg-primary dark:hover:text-primary-foreground hover:text-primary-foreground rounded-md ${
+                isCollapsed ? "justify-center" : ""
+              }`}
+            >
+              <div className="w-6">{menu.icon}</div>
+              {!isCollapsed && menu.name}
+            </Link>
+          )}
         </div>
-      </ScrollArea>
+      ))}
     </div>
+  </ScrollArea>
+
+  {/* Toggle Button */}
+  <button
+    onClick={toggleSidebar}
+    className="absolute bottom-4 right-4 bg-gray-400 text-white rounded-full p-2 shadow-md hover:bg-gray-500 z-10"
+  >
+    {isCollapsed ? <ChevronRightIcon size={18} /> : <ChevronLeftIcon size={18} />}
+  </button>
+</div>
+
   );
 }
