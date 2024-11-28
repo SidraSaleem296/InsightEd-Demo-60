@@ -700,7 +700,7 @@
 //     );
 // }
 
-
+"use client"
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -723,6 +723,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
+import { getAuthSession } from "@/lib/auth";
 
 type Menu = {
   name: string;
@@ -738,6 +739,25 @@ type Submenu = {
 };
 
 export function SidebarMenu() {
+  const [userId, setUserId] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    async function fetchSession() {
+      try {
+        const response = await fetch("/api/auth/session"); // Fetch session from API route
+        if (response.ok) {
+          const session = await response.json();
+          setUserId(session?.user?.id || null); // Set the user ID
+        } else {
+          console.error("Failed to fetch session");
+        }
+      } catch (error) {
+        console.error("Error fetching session:", error);
+      }
+    }
+
+    fetchSession();
+  }, []);
   const menus: Menu[] = [
     {
       name: "Dashboard",
@@ -824,7 +844,7 @@ export function SidebarMenu() {
     {
       name: "Profile",
       icon: <User size={15} className="mr-2" />,
-      href: "/profile",
+      href: `/profile/${userId}`,
     },
     {
       name: "Settings",
