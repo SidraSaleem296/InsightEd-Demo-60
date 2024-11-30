@@ -1,27 +1,39 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db'; // Adjust the import path if necessary
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions);
   const { id } = params;
 
   if (!id) {
-    return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+    return NextResponse.json({ error: "User ID is required" }, { status: 400 });
   }
 
   try {
     // Fetch the user details
     const user = await prisma.user.findUnique({
       where: { id },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        username: true,
+        bio: true,
+        image: true,
+        coverImage: true,
+        followerIds: true,
+        followingIds: true,
         posts: {
-          orderBy: { createdAt: 'desc' }, // Order posts by most recent
+          orderBy: { createdAt: "desc" },
           include: { comments: true },
         },
       },
     });
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // Fetch followers
@@ -29,6 +41,10 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
       where: { followingIds: { has: id } },
       select: { id: true, name: true, username: true, image: true },
     });
+
+    const isFollowing = session
+      ? user.followerIds.includes(session.user.id)
+      : false;
 
     // Build the response
     const response = {
@@ -39,8 +55,10 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
       email: user.email,
       image: user.image,
       coverImage: user.coverImage,
-      followerCount: followers.length,
+      followerCount: user.followerIds.length,
+      followingCount: user.followingIds.length,
       followers,
+      isFollowing,
       posts: user.posts.map((post) => ({
         id: post.id,
         body: post.body,
@@ -54,7 +72,10 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 
     return NextResponse.json(response, { status: 200 });
   } catch (error) {
-    console.error('Error fetching user profile:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Error fetching user profile:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
