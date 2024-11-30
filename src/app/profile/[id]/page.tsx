@@ -3,13 +3,24 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import axios from "axios";
+import PostForm from "@/components/PostForm";
+import { useSession } from "next-auth/react";
 
 const ProfilePage = ({ params }: { params: { id: string } }) => {
   const { id } = params; // Extract `id` from the dynamic route
-
+  
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { data: session } = useSession();
+  const [posts, setPosts] = useState(profile?.posts || []);
+  const [isFollowing, setIsFollowing] = useState(profile?.isFollowing || false);
+
+
+  // Check if the logged-in user is viewing their own profile
+  const isOwnProfile = session?.user?.id === profile?.id;
+
+
 
   useEffect(() => {
     console.log("Dynamic Route ID:", id); // Debug the ID
@@ -30,6 +41,22 @@ const ProfilePage = ({ params }: { params: { id: string } }) => {
 
     fetchProfile();
   }, [id]);
+
+  const handlePostCreated = (newPost) => {
+    setPosts([newPost, ...posts]); // Add the new post to the top of the feed
+  };
+
+  const handleFollowToggle = async () => {
+    try {
+      const response = await axios.post("/api/user/follow", {
+        targetUserId: profile.id,
+      });
+      setIsFollowing((prev) => !prev);
+      console.log(response.data.message);
+    } catch (err) {
+      console.error("Error following/unfollowing user:", err);
+    }
+  };
 
   if (loading) {
     return <div>Loading...</div>; // Show loading state
@@ -72,6 +99,20 @@ const ProfilePage = ({ params }: { params: { id: string } }) => {
           <p className="text-2xl">{profile.posts.length}</p>
         </div>
       </div>
+
+      {/* Follow/Unfollow Button */}
+      {!isOwnProfile && (
+        <button
+          onClick={handleFollowToggle}
+          className={`px-4 py-2 rounded ${
+            isFollowing ? "bg-red-500" : "bg-blue-500"
+          } text-white`}
+        >
+          {isFollowing ? "Unfollow" : "Follow"}
+        </button>
+      )}
+
+      {isOwnProfile && <PostForm onPostCreated={handlePostCreated} />}
 
       {/* User Posts */}
       <div className="posts">
