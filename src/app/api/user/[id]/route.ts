@@ -79,3 +79,19 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     );
   }
 }
+
+export async function PUT(req: Request, { params }: { params: { id: string } }) {
+  const { id } = params;
+  const updates = await req.json();
+
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: updates,
+    });
+    return NextResponse.json(updatedUser);
+  } catch (error) {
+    console.error("Error updating user:", error);
+    return NextResponse.json({ error: "Failed to update profile" }, { status: 500 });
+  }
+}

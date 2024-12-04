@@ -27,12 +27,25 @@ export async function GET() {
             image: true,
           },
         },
-        comments: true, // Include comments for each post
+        comments: {
+          select: { id: true }, // Include only the IDs for comments
+        },
       },
       orderBy: { createdAt: "desc" }, // Order by most recent
     });
 
-    return NextResponse.json(posts, { status: 200 });
+    // Format the response to include like count and likedByUser
+    const formattedPosts = posts.map((post) => ({
+      id: post.id,
+      body: post.body,
+      imageUrl: post.imageUrl,
+      likes: post.likes.length, // Return the like count
+      likedByUser: post.likes.includes(session.user.id), // Check if the current user has liked the post
+      comments: post.comments.length, // Return the count of comments
+      user: post.user, // Include the post owner's details
+    }));
+
+    return NextResponse.json(formattedPosts, { status: 200 });
   } catch (error) {
     console.error("Error fetching posts:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

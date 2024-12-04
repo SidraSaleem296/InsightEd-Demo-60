@@ -2,16 +2,25 @@
 
 import { useState, useEffect } from "react";
 import axios from "axios";
-import Image from "next/image";
-import Link from "next/link";
 import PostForm from "@/components/PostForm";
+import Post from "@/components/Post";
+import Image from "next/image";
+
+type PostType = {
+  id: string;
+  body: string;
+  imageUrl?: string;
+  likes: number;
+  likedByUser: boolean;
+  comments: number;
+};
 
 export default function FeedPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState<PostType[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch posts from followed users
   useEffect(() => {
@@ -30,7 +39,7 @@ export default function FeedPage() {
   }, []);
 
   // Handle search
-  const handleSearch = async (e) => {
+  const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
 
     if (e.target.value.trim() === "") {
@@ -46,10 +55,26 @@ export default function FeedPage() {
     }
   };
 
-  const handlePostCreated = (newPost) => {
-    setPosts([newPost, ...posts]); // Add the new post to the top of the feed
+  // Handle new post creation
+  const handlePostCreated = (newPost: PostType) => {
+    setPosts((prev) => [newPost, ...prev]);
   };
 
+  // Handle like updates
+  const handleLikeUpdate = (postId: string, newLikeCount: number, liked: boolean) => {
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === postId
+          ? {
+              ...post,
+              likes: newLikeCount,
+              likedByUser: liked, // Update the `likedByUser` property dynamically
+            }
+          : post
+      )
+    );
+  };
+  
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
@@ -67,8 +92,8 @@ export default function FeedPage() {
         />
         {searchResults.length > 0 && (
           <div className="absolute top-full left-0 right-0 bg-white shadow-lg border rounded-lg z-10">
-            {searchResults.map((user) => (
-              <Link
+            {searchResults.map((user: any) => (
+              <a
                 href={`/profile/${user.id}`}
                 key={user.id}
                 className="block px-4 py-2 hover:bg-gray-100"
@@ -86,7 +111,7 @@ export default function FeedPage() {
                     <p className="text-sm text-gray-500">@{user.username || "unknown"}</p>
                   </div>
                 </div>
-              </Link>
+              </a>
             ))}
           </div>
         )}
@@ -95,40 +120,19 @@ export default function FeedPage() {
       <PostForm onPostCreated={handlePostCreated} />
 
       {/* Posts Feed */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
         {posts.length === 0 ? (
           <p>No posts from followed users.</p>
         ) : (
           posts.map((post) => (
-            <div key={post.id} className="border rounded-lg p-4 shadow">
-              <div className="flex items-center mb-4">
-                <Image
-                  src={post.user?.image || "/default-avatar.png"}
-                  alt={post.user?.name || "User"}
-                  width={40}
-                  height={40}
-                  className="rounded-full mr-2"
-                />
-                <div>
-                  <p className="font-semibold">{post.user?.name}</p>
-                  <p className="text-sm text-gray-500">@{post.user?.username}</p>
-                </div>
-              </div>
-              <p className="mb-4">{post.body}</p>
-              {post.imageUrl && (
-                <Image
-                  src={post.imageUrl}
-                  alt="Post Image"
-                  width={500}
-                  height={300}
-                  className="rounded-lg object-cover"
-                />
-              )}
-              <div className="flex justify-between items-center mt-4 text-sm text-gray-600">
-                <span>{post.likes} Likes</span>
-                <span>{post.comments?.length} Comments</span>
-              </div>
-            </div>
+            <Post
+              key={post.id}
+              post={post}
+              onLike={handleLikeUpdate}
+              onCommentAdded={(postId: string) => {
+                console.log(`Comment added to post ${postId}`);
+              }}
+            />
           ))
         )}
       </div>

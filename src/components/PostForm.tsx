@@ -26,13 +26,13 @@ const PostForm = ({ onPostCreated }) => {
         placeholder="Write something..."
         className="w-full border rounded p-2"
       ></textarea>
-      <input
+      {/* <input
         type="text"
         value={imageUrl}
         onChange={(e) => setImageUrl(e.target.value)}
         placeholder="Image URL (optional)"
         className="w-full border rounded p-2"
-      />
+      /> */}
       <button
         type="submit"
         className="px-4 py-2 bg-blue-500 text-white rounded"
