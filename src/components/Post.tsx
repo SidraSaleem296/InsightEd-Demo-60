@@ -3,6 +3,7 @@ import Image from "next/image";
 import axios from "axios";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { AiOutlineComment } from "react-icons/ai";
+import Link from "next/link"; // Import Link from Next.js
 
 type PostProps = {
   post: {
@@ -87,7 +88,9 @@ const Post: React.FC<PostProps> = ({ post, onLike, onCommentAdded }) => {
     if (!comment.trim()) return;
 
     try {
-      const response = await axios.post(`/api/posts/${post.id}/comments`, { comment });
+      const response = await axios.post(`/api/posts/${post.id}/comments`, {
+        comment,
+      });
       const newComment = response.data as Comment; // Cast response to Comment type
       setComments((prev) => [newComment, ...prev]); // Add new comment to the top of the list
       onCommentAdded(post.id);
@@ -96,7 +99,6 @@ const Post: React.FC<PostProps> = ({ post, onLike, onCommentAdded }) => {
       console.error("Error adding comment:", error);
     }
   };
-  
 
   return (
     <div className="post border p-4 rounded shadow hover:shadow-lg">
@@ -111,7 +113,10 @@ const Post: React.FC<PostProps> = ({ post, onLike, onCommentAdded }) => {
             className="rounded-full mr-3"
           />
           <div>
-            <p className="font-semibold">{post.user.name}</p>
+            {/* Link to user profile */}
+            <Link href={`/profile/${post.user.id}`}>
+              <p className="font-semibold hover:underline">{post.user.name}</p>
+            </Link>
             <p className="text-sm text-gray-500">@{post.user.username}</p>
           </div>
         </div>
@@ -136,7 +141,11 @@ const Post: React.FC<PostProps> = ({ post, onLike, onCommentAdded }) => {
       {/* Like and Comment Actions */}
       <div className="flex justify-between items-center text-sm text-gray-600 mt-4">
         {/* Like Button */}
-        <button onClick={handleLike} disabled={isLiking} className="flex items-center gap-1 text-red-500">
+        <button
+          onClick={handleLike}
+          disabled={isLiking}
+          className="flex items-center gap-1 text-red-500"
+        >
           {post.likedByUser ? (
             <FaHeart className="text-xl" />
           ) : (
@@ -146,7 +155,10 @@ const Post: React.FC<PostProps> = ({ post, onLike, onCommentAdded }) => {
         </button>
 
         {/* Comment Button */}
-        <button onClick={openCommentModal} className="flex items-center gap-1 text-blue-500">
+        <button
+          onClick={openCommentModal}
+          className="flex items-center gap-1 text-blue-500"
+        >
           <AiOutlineComment className="text-xl" />
           {post.comments} Comments
         </button>
@@ -173,7 +185,11 @@ const Post: React.FC<PostProps> = ({ post, onLike, onCommentAdded }) => {
                           className="rounded-full mr-3"
                         />
                         <div>
-                          <p className="font-semibold">{comment.user.username}</p>
+                        <Link href={`/profile/${comment.user.id}`}>
+                          <p className="font-semibold text-black hover:underline">
+                            {comment.user.username}
+                          </p>
+                          </Link>
                           <p className="text-gray-700">{comment.body}</p>
                           <span className="text-xs text-gray-500">
                             {new Date(comment.createdAt).toLocaleString()}
