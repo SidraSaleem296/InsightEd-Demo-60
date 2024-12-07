@@ -44,7 +44,7 @@ model Session {
 model User {
   id                String    @id @default(auto()) @map("_id") @db.ObjectId
   name              String?
-  username          String?   @unique
+  username          String?   
   bio               String?
   email             String?   @unique
   emailVerified     DateTime?
@@ -54,6 +54,7 @@ model User {
   hashedPassword    String?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
+  followerIds      String[]   @db.ObjectId
   followingIds      String[]   @db.ObjectId
   hasNotifications   Boolean?
   credits           Int       @default(10) // Added from the first User model
@@ -174,29 +175,32 @@ model QuestionC {
 
 // Post Model
 model Post {
-  id String   @id @default(auto()) @map("_id") @db.ObjectId
-  body String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  userId String @db.ObjectId
-  likedIds String[] @db.ObjectId
-
-  user User @relation(fields: [userId], references: [id], onDelete:Cascade)
-  comments Comment[]
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String    @db.ObjectId
+  body       String
+  imageUrl   String?   // Optional image URL
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  likes      String[]  @db.ObjectId // List of user IDs who liked the post
+  comments   Comment[]
+  
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
 
 // Comment Model
 model Comment {
-  id String   @id @default(auto()) @map("_id") @db.ObjectId
-  body String
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  postId    String   @db.ObjectId
+  body      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  userId String @db.ObjectId
-  postId String @db.ObjectId
 
-  user User @relation(fields: [userId], references: [id], onDelete:Cascade)
-  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
+
 
 // Notifications Model
 model Notifications {
