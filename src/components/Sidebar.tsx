@@ -782,11 +782,6 @@ export function SidebarMenu() {
           href: "/create",
         },
         {
-          name: "Lesson Planning",
-          icon: <Calendar size={15} className="mr-2" />,
-          href: "/lesson-planning",
-        },
-        {
           name: "Quiz",
           icon: <Clipboard size={15} className="mr-2" />,
           href: "/QuizDashboard",
@@ -847,7 +842,7 @@ export function SidebarMenu() {
     {
       name: "Notifications",
       icon: <Bell size={15} className="mr-2" />,
-      href: "/notifications",
+      href: "/NotificationsPage",
     },
     {
       name: "Profile",
