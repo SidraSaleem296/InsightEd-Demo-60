@@ -1204,7 +1204,7 @@ type Submenu = {
 
 export function SidebarMenu() {
   const [isCollapsed, setIsCollapsed] = useState(false); // State to manage sidebar visibility
-
+  const [userRole, setUserRole] = React.useState<string | null>(null); // Add userRole state
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed); // Toggle sidebar state
   };
@@ -1218,6 +1218,7 @@ export function SidebarMenu() {
         if (response.ok) {
           const session = await response.json();
           setUserId(session?.user?.id || null); // Set the user ID
+          setUserRole(session?.user?.role || null); // Set the user role
         } else {
           console.error("Failed to fetch session");
         }
@@ -1235,10 +1236,53 @@ export function SidebarMenu() {
       icon: <Home size={15} className="mr-2" style={{ color: "grey" }} />,
       href: "/dashboard",
     },
+    // Conditionally render the Admin menu
+    ...(userRole === "admin"
+      ? [
+          {
+            name: "Admin",
+            icon: <Book size={15} className="mr-2" />,
+            submenu: [
+              {
+                name: "Admin Dashboard",
+                icon: (
+                  <Home size={15} className="mr-2" style={{ color: "grey" }} />
+                ),
+                href: "/admin/dashboard",
+              },
+              {
+                name: "Course Management",
+                icon: <Calendar size={15} className="mr-2" />,
+                href: "/admin/courses",
+              },
+              {
+                name: "Custom Notifications",
+                icon: <Bell size={15} className="mr-2" />,
+                href: "/admin/notifications",
+              },
+              {
+                name: "User Management",
+                icon: <User size={15} className="mr-2" />,
+                href: "/admin/users",
+              },
+              {
+                name: "Analytics",
+                icon: <TrendingUp size={15} className="mr-2" />,
+                href: "/admin/analytics",
+              },
+            ],
+          },
+        ]
+      : []),
     {
       name: "Courses",
       icon: <Book size={15} className="mr-2" />,
       submenu: [
+        {
+          name: "Dashboard",
+          icon: <Home size={15} className="mr-2" style={{ color: "grey" }} />,
+          href: "/Dashboard",
+        },
         {
           name: "Create",
           icon: <Calendar size={15} className="mr-2" />,

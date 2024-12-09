@@ -42,22 +42,22 @@ model Session {
 
 // User Model
 model User {
-  id                String    @id @default(auto()) @map("_id") @db.ObjectId
+  id                String      @id @default(auto()) @map("_id") @db.ObjectId
   name              String?
   username          String?   
   bio               String?
-  email             String?   @unique
+  email             String?     @unique
   emailVerified     DateTime?
   image             String?
   coverImage        String?
   profileImage      String?
   hashedPassword    String?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  followerIds      String[]   @db.ObjectId
-  followingIds      String[]   @db.ObjectId
-  hasNotifications   Boolean?
-  credits           Int       @default(10) // Added from the first User model
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  followerIds       String[]    @db.ObjectId
+  followingIds      String[]    @db.ObjectId
+  hasNotifications  Boolean?
+  credits           Int         @default(10) // Added from the first User model
   games             Game[]
   accounts          Account[]
   sessions          Session[]
@@ -65,6 +65,7 @@ model User {
   comments          Comment[]
   notifications     Notification[]
   activities        Activity[] 
+  role              String      @default("user") // "user" or "admin"
 }
 
 
@@ -73,7 +74,7 @@ model Course {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
   name  String
   image String
-  units Unit[]
+  units Unit[] 
 
   @@index([name], name: "course_name")
 }
@@ -84,8 +85,8 @@ model Unit {
   courseId String
 
   name     String
-  course   Course    @relation(fields: [courseId], references: [id])
-  chapters Chapter[]
+  course   Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  chapters Chapter[] 
 
   @@index([courseId], name: "unit_courseId")
 }
@@ -98,7 +99,7 @@ model Chapter {
   youtubeSearchQuery String
   videoId            String?
   summary            String?
-  unit               Unit        @relation(fields: [unitId], references: [id])
+  unit               Unit        @relation(fields: [unitId], references: [id], onDelete: Cascade)
   questionsC         QuestionC[] // Added to create the relation with QuestionC
 
   @@index([unitId], name: "chapter_unitId")
@@ -165,7 +166,7 @@ model QuestionC {
   question String
   answer   String
   options  String
-  chapter  Chapter  @relation(fields: [chapterId], references: [id])
+  chapter  Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
 
   @@index([chapterId], name: "chapterId")
 }
