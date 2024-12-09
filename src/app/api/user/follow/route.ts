@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     const [currentUser, targetUser] = await prisma.$transaction([
       prisma.user.findUnique({
         where: { id: session.user.id },
-        select: { followingIds: true },
+        select: { followingIds: true, name: true },
       }),
       prisma.user.findUnique({
         where: { id: targetUserId },
@@ -51,6 +51,14 @@ export async function POST(request: Request) {
             followerIds: {
               set: targetUser.followerIds.filter((id) => id !== session.user.id),
             },
+          },
+        }),
+        prisma.notification.create({
+          data: {
+            userId: targetUserId, // The user being followed gets the notification
+            type: "follow",
+            message: `${currentUser.name || "Someone"} followed you.`,
+            postId: session.user.id
           },
         }),
       ]);

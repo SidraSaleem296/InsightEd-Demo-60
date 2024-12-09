@@ -1,4 +1,3 @@
-
 // import { ScrollArea } from "@/components/ui/scroll-area";
 // import { cn } from "@/lib/utils";
 // import { ChevronDownIcon, Home, ListVideo, Menu, Mic2, Music, Play, RadioIcon, SquareStack, User } from "lucide-react";
@@ -270,9 +269,6 @@
 //     );
 // }
 
-
-
-
 // import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 // import { ScrollArea } from "@/components/ui/scroll-area";
 // import { ChevronDownIcon, Home, Book, Calendar, User, Bell, FileText, Users, Globe, Settings, Clipboard } from "lucide-react";
@@ -399,11 +395,6 @@
 //         </div>
 //     );
 // }
-
-
-
-
-
 
 // import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 // import { ScrollArea } from "@/components/ui/scroll-area";
@@ -935,8 +926,6 @@
 //   );
 // }
 
-
-
 // "use client"
 // import { useState } from "react";
 // import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -1167,11 +1156,15 @@
 //   );
 // }
 
-
 "use client";
 
 import { useState } from "react";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   ChevronDownIcon,
@@ -1246,21 +1239,53 @@ export function SidebarMenu() {
       name: "Courses",
       icon: <Book size={15} className="mr-2" />,
       submenu: [
-        { name: "Create", icon: <Calendar size={15} className="mr-2" />, href: "/create" },
-        { name: "Lesson Planning", icon: <Calendar size={15} className="mr-2" />, href: "/lesson-planning" },
-        { name: "Quiz", icon: <Clipboard size={15} className="mr-2" />, href: "/QuizDashboard" },
-        { name: "Gallery", icon: <Image size={15} className="mr-2" />, href: "/gallery" },
-        { name: "Documents", icon: <FileText size={15} className="mr-2" />, href: "/Docs/documents" },
-        { name: "Notes", icon: <Clipboard size={15} className="mr-2" />, href: "/Docs/notes" },
-        { name: "Chat", icon: <MessageSquare size={15} className="mr-2" />, href: "/Docs/search" },
+        {
+          name: "Create",
+          icon: <Calendar size={15} className="mr-2" />,
+          href: "/create",
+        },
+        // { name: "Lesson Planning", icon: <Calendar size={15} className="mr-2" />, href: "/lesson-planning" },
+        {
+          name: "Quiz",
+          icon: <Clipboard size={15} className="mr-2" />,
+          href: "/QuizDashboard",
+        },
+        {
+          name: "Gallery",
+          icon: <Image size={15} className="mr-2" />,
+          href: "/gallery",
+        },
+        {
+          name: "Documents",
+          icon: <FileText size={15} className="mr-2" />,
+          href: "/Docs/documents",
+        },
+        {
+          name: "Notes",
+          icon: <Clipboard size={15} className="mr-2" />,
+          href: "/Docs/notes",
+        },
+        {
+          name: "Chat",
+          icon: <MessageSquare size={15} className="mr-2" />,
+          href: "/Docs/search",
+        },
       ],
     },
     {
       name: "Habit Tracker",
       icon: <TrendingUp size={15} className="mr-2" style={{ color: "grey" }} />,
       submenu: [
-        { name: "Habit Analysis", icon: <TrendingUp size={15} className="mr-2" />, href: "/dashboard" },
-        { name: "Activities", icon: <Activity size={15} className="mr-2" />, href: "/dashboard/activities/" },
+        {
+          name: "Habit Analysis",
+          icon: <TrendingUp size={15} className="mr-2" />,
+          href: "/dashboard",
+        },
+        {
+          name: "Activities",
+          icon: <Activity size={15} className="mr-2" />,
+          href: "/dashboard/activities/",
+        },
       ],
     },
     {
@@ -1281,20 +1306,26 @@ export function SidebarMenu() {
     {
       name: "Notifications",
       icon: <Bell size={15} className="mr-2" />,
-      href: "/notifications",
+      href: "/NotificationsPage",
     },
     {
       name: "Profile",
       icon: <User size={15} className="mr-2" />,
       href: userId ? `/profile/${userId}` : "/profile",
     },
-    { name: "Settings", icon: <Settings size={15} className="mr-2" />, href: "/settings" },
+    {
+      name: "Settings",
+      icon: <Settings size={15} className="mr-2" />,
+      href: "/settings",
+    },
   ];
 
   return (
     <div
       className={`h-screen fixed transition-all duration-300 ${
-        isCollapsed ? "w-16 bg-gray-200 dark:bg-gray-800" : "w-64 bg-gray-200 dark:bg-gray-800"
+        isCollapsed
+          ? "w-16 bg-gray-200 dark:bg-gray-800"
+          : "w-64 bg-gray-200 dark:bg-gray-800"
       }`}
     >
       <ScrollArea className="h-full rounded-md overflow-y-auto">
@@ -1350,7 +1381,11 @@ export function SidebarMenu() {
         onClick={toggleSidebar}
         className="absolute bottom-4 right-4 bg-gray-400 text-white rounded-full p-2 shadow-md hover:bg-gray-500 z-10"
       >
-        {isCollapsed ? <ChevronRightIcon size={18} /> : <ChevronLeftIcon size={18} />}
+        {isCollapsed ? (
+          <ChevronRightIcon size={18} />
+        ) : (
+          <ChevronLeftIcon size={18} />
+        )}
       </button>
     </div>
   );

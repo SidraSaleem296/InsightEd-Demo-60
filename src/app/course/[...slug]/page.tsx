@@ -106,7 +106,6 @@
 
 // export default CoursePage;
 
-
 // import CourseSideBar from "@/components/CourseSideBar";
 // import MainVideoSummary from "@/components/MainVideoSummary";
 // import QuizCards from "@/components/QuizCards";
@@ -222,7 +221,6 @@
 
 // export default CoursePage;
 
-
 import CourseSideBar from "@/components/CourseSideBar";
 import MainVideoSummary from "@/components/MainVideoSummary";
 import QuizCards from "@/components/QuizCards";
@@ -230,7 +228,11 @@ import { prisma } from "@/lib/db";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import axios from "axios";
 import React from "react";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import { NextResponse } from "next/server";
 
 type Props = {
   params: {
@@ -276,6 +278,43 @@ const CoursePage = async ({ params: { slug } }: Props) => {
 
   const nextChapter = unit.chapters[chapterIndex + 1];
   const prevChapter = unit.chapters[chapterIndex - 1];
+
+  const isLastChapterInUnit = chapterIndex === unit.chapters.length - 1;
+  const isLastUnit = unitIndex === course.units.length - 1;
+  const isLastChapterInCourse =
+    isLastChapterInUnit && isLastUnit && nextChapter === undefined;
+
+  // Send notifications
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const baseUrl =
+      process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"; // Use NEXT_PUBLIC_BASE_URL or fallback to localhost
+
+    if (isLastChapterInUnit) {
+      // Notify user of unit completion
+      await axios.post(`${baseUrl}/api/notifications/create`, {
+        userId: session.user.id,
+        type: "unit-completion",
+        message: `You have completed "${unit.name}". Well done!`,
+      });
+    }
+
+    if (isLastChapterInCourse) {
+      // Notify user of course completion
+      await axios.post(`${baseUrl}/api/notifications/create`, {
+        userId: session.user.id,
+        type: "course-completion",
+        message: `Congratulations! You have completed the course "${course.name}". 🎉`,
+      });
+    }
+  } catch (error) {
+    console.error("Error creating completion notification:", error);
+  }
 
   return (
     <div>

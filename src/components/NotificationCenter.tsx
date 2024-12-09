@@ -43,7 +43,9 @@ const NotificationCenter = () => {
   const deleteNotification = async (id: string) => {
     try {
       await axios.delete(`/api/notifications/${id}/delete`);
-      setNotifications((prev) => prev.filter((notification) => notification.id !== id));
+      setNotifications((prev) =>
+        prev.filter((notification) => notification.id !== id)
+      );
     } catch (error) {
       console.error("Error deleting notification:", error);
     }
@@ -69,8 +71,8 @@ const NotificationCenter = () => {
               key={notification.id}
               className="p-4 border rounded shadow hover:shadow-lg flex justify-between items-center"
             >
-              <Link href={`/profile/${notification.postId}`}>
-                <a className="text-blue-500 hover:underline">{notification.message}</a>
+              <Link href={`/profile/${notification.postId}`} className="text-blue-500 hover:underline">
+                {notification.message}
               </Link>
               <button
                 onClick={() => deleteNotification(notification.id)}

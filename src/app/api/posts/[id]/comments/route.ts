@@ -78,6 +78,24 @@ export async function POST(
       },
     });
 
+    // Fetch the post to identify its owner
+    const post = await prisma.post.findUnique({
+      where: { id: id },
+      select: { userId: true },
+    });
+
+    // Create a notification for the post owner
+    if (post?.userId) {
+      await prisma.notification.create({
+        data: {
+          userId: post.userId, // Post owner's ID
+          type: "comment", // Notification type
+          message: `${session.user.name || "Someone"} commented on your post.`, // Notification message
+          postId: session.user.id
+        },
+      });
+    }
+
     return NextResponse.json(newComment, { status: 201 });
   } catch (error) {
     console.error("Error creating comment:", error);
