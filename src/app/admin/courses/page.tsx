@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 type Course = {
   id: string;
@@ -15,6 +16,7 @@ const CourseManagementPage = () => {
   const [editingCourseId, setEditingCourseId] = useState<string | null>(null);
   const [newCourseName, setNewCourseName] = useState<string>("");
   const router = useRouter();
+  const { data: session } = useSession();
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -30,6 +32,15 @@ const CourseManagementPage = () => {
 
     fetchCourses();
   }, []);
+
+  if (!session) {
+    return <p>Loading...</p>;
+  }
+
+  if (session.user.role !== "admin") {
+    router.push("/auth");
+    return null;
+  }
 
   const handleEdit = (courseId: string, currentName: string) => {
     setEditingCourseId(courseId);

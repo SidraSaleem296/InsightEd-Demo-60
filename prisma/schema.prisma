@@ -212,7 +212,7 @@ model Notification {
   createdAt DateTime @default(now())
   read      Boolean  @default(false)
 
-  user      User     @relation(fields: [userId], references: [id]) // Relating notifications to the user
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Relating notifications to the user
 }
 
 model Activity {
