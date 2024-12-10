@@ -1252,7 +1252,8 @@ export function SidebarMenu() {
         { name: "Gallery", icon: <Image size={15} className="mr-2" />, href: "/gallery" },
         { name: "Documents", icon: <FileText size={15} className="mr-2" />, href: "/Docs/documents" },
         { name: "Notes", icon: <Clipboard size={15} className="mr-2" />, href: "/Docs/notes" },
-        { name: "Chat", icon: <MessageSquare size={15} className="mr-2" />, href: "/Docs/search" },
+        { name: "Doc Search", icon: <Search size={15} className="mr-2" />, href: "/Docs/search" },
+        { name: "Chatbots", icon: <MessageSquare size={15} className="mr-2" />, href: "/chatbot" },
       ],
     },
     {
