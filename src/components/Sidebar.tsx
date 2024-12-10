@@ -1241,7 +1241,7 @@ export function SidebarMenu() {
       ? [
           {
             name: "Admin",
-            icon: <Book size={15} className="mr-2" />,
+            icon: <User size={15} className="mr-2" />,
             submenu: [
               {
                 name: "Admin Dashboard",

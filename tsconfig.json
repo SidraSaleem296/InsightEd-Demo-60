@@ -60,6 +60,7 @@
       "zlib": ["node_modules/browserify-zlib"],
       "process": ["node_modules/process/browser"]
     },
+    "typeRoots": ["./node_modules/@types", "./src/types"], // Add this line to include your custom types
     "plugins": [
       {
         "name": "next"
