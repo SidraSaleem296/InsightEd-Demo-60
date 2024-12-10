@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useState } from "react";
 import TextToSpeech from "@/components/TextToSpeech";
@@ -46,17 +46,35 @@ const BlogPost = () => {
   };
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">PDF to Speech App</h1>
-      <input
-        type="file"
-        accept=".pdf"
-        onChange={handleFileChange}
-        className="mb-4 p-2 border rounded"
-      />
-      {fileName && <p className="mb-4">Uploaded: {fileName}</p>}
-      {text && <TextToSpeech text={text} />}
-      {!text && <p className="text-gray-500">Upload a PDF to start.</p>}
+    <div className="p-8 max-w-3xl mx-auto bg-gray-900 text-white rounded-lg shadow-lg">
+      <h1 className="text-3xl font-bold mb-6 text-center">PDF to Speech App</h1>
+      <div className="flex flex-col items-center">
+        <label
+          htmlFor="fileInput"
+          className="cursor-pointer px-6 py-2 mb-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition duration-300"
+        >
+          Upload PDF
+        </label>
+        <input
+          id="fileInput"
+          type="file"
+          accept=".pdf"
+          onChange={handleFileChange}
+          className="hidden"
+        />
+        {fileName && (
+          <p className="mb-6 text-sm text-gray-400">
+            <span className="font-semibold text-white">Uploaded:</span> {fileName}
+          </p>
+        )}
+        {text ? (
+          <div className="w-full bg-gray-800 p-6 rounded-lg">
+            <TextToSpeech text={text} />
+          </div>
+        ) : (
+          <p className="text-gray-500 mt-6 text-center">Upload a PDF to start.</p>
+        )}
+      </div>
     </div>
   );
 };
