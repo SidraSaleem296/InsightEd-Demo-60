@@ -66,6 +66,18 @@ model User {
   notifications     Notification[]
   activities        Activity[] 
   role              String      @default("user") // "user" or "admin"
+  feedbackSubmitted Boolean     @default(false) // Indicates if feedback has been submitted
+  feedbacks         Feedback[]  // Relation to Feedback
+}
+
+// New Feedback Model
+model Feedback {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  content     String
+  isAnonymous Boolean   @default(false) // Indicates if the feedback is anonymous
+  userId      String?   @db.ObjectId // Nullable, as it can be null for anonymous feedback
+  user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
 }
 
 

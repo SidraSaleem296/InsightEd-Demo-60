@@ -1266,8 +1266,13 @@ export function SidebarMenu() {
                 href: "/admin/users",
               },
               {
+                name: "Feedback",
+                icon: <Clipboard size={15} className="mr-2" />,
+                href: "/admin/feedback",
+              },
+              {
                 name: "Analytics",
-                icon: <TrendingUp size={15} className="mr-2" />,
+                icon: <Activity size={15} className="mr-2" />,
                 href: "/admin/analytics",
               },
             ],
@@ -1356,6 +1361,11 @@ export function SidebarMenu() {
       name: "Profile",
       icon: <User size={15} className="mr-2" />,
       href: userId ? `/profile/${userId}` : "/profile",
+    },
+    {
+      name: "Feedback",
+      icon: <Clipboard size={15} className="mr-2" />,
+      href: "/feedback",
     },
     {
       name: "Settings",

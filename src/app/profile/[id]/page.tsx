@@ -8,6 +8,7 @@ import FollowerList from "@/components/FollowerList";
 import ProfileEditableField from "@/components/ProfileEditableField";
 import Post from "@/components/Post"; // Import the Post component
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 type PostType = {
   id: string;
@@ -43,6 +44,7 @@ const ProfilePage = ({ params }: { params: { id: string } }) => {
   const [showFollowing, setShowFollowing] = useState(false);
   const [followers, setFollowers] = useState([]);
   const [following, setFollowing] = useState([]);
+  const router = useRouter();
 
   // Check if the logged-in user is viewing their own profile
   const isOwnProfile = session?.user?.id === profile?.id;
@@ -160,6 +162,17 @@ const ProfilePage = ({ params }: { params: { id: string } }) => {
 
   return (
     <div className="container mx-auto p-4">
+      {/* Edit Profile Button
+      {isOwnProfile && (
+        <div className="flex justify-end">
+          <button
+            onClick={() => router.push("/editProfile")}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Edit Profile
+          </button>
+        </div>
+      )} */}
       {/* User Info */}
       <div className="profile-header text-center flex flex-col items-center">
         <div className="relative inline-block">
@@ -200,7 +213,7 @@ const ProfilePage = ({ params }: { params: { id: string } }) => {
 
       {/* Follow/Unfollow Button */}
       <div className="flex justify-center mt-5 mb-5">
-      {!isOwnProfile && (
+      {session && !isOwnProfile && (
         <button
           onClick={handleFollowToggle}
           className={`px-4 py-2 rounded ${
