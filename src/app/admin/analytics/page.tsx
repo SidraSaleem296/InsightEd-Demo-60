@@ -248,15 +248,26 @@ const AdminAnalyticsPage = () => {
               User Subscription
             </h3> */}
 
-              <CustomPieChart
-                data={userSubscriptionData}
-                title="User Subscription"
-              />
-            
+            <CustomPieChart
+              data={[
+                {
+                  name: "Subscribed Users",
+                  count: analyticsData.subscribedUsers,
+                  color: "#36A2EB",
+                },
+                {
+                  name: "Non-Subscribed Users",
+                  count:
+                    analyticsData.totalUsers - analyticsData.subscribedUsers,
+                  color: "#FF6384",
+                },
+              ]}
+              title="User Subscription"
+            />
           </div>
 
           <div className="bg-gray-800 text-white p-4 rounded shadow">
-            <h3 className="text-lg font-semibold text-center">Insights</h3>
+            <h3 className="text-lg mb-3 font-semibold text-center">Insights</h3>
             <Line data={lineData} />
           </div>
 
@@ -264,9 +275,22 @@ const AdminAnalyticsPage = () => {
             {/* <h3 className="text-lg font-semibold text-center">
               Feedback Users
             </h3> */}
-
-              <CustomPieChart data={feedbackUsersData} title="Feedback Users" />
-            
+  
+            <CustomPieChart
+              data={[
+                {
+                  name: "Feedback Users",
+                  count: analyticsData.feedbackUsers,
+                  color: "#4BC0C0",
+                },
+                {
+                  name: "Non-Feedback Users",
+                  count: analyticsData.totalUsers - analyticsData.feedbackUsers,
+                  color: "#FF9F40",
+                },
+              ]}
+              title="Feedback Users"
+            />
           </div>
         </div>
 
