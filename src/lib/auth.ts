@@ -75,6 +75,8 @@ declare module "next-auth" {
     user: {
       id: string;
       credits: number;
+      followingIds: string[]; // Add this line
+      role: string; // Add this line
     } & DefaultSession["user"];
   }
 }
@@ -83,6 +85,8 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: string;
     credits: number;
+    followingIds: string[]; // Add this line
+    role: string; // Add this line
   }
 }
 
@@ -101,6 +105,8 @@ export const authOptions: NextAuthOptions = {
       if (db_user) {
         token.id = db_user.id;
         token.credits = db_user.credits;
+        token.followingIds = db_user.followingIds; // Add this line
+        token.role = db_user.role; // Add this line to include the role
       }
       return token;
     },
@@ -111,6 +117,8 @@ export const authOptions: NextAuthOptions = {
         session.user.email = token.email;
         session.user.image = token.picture;
         session.user.credits = token.credits;
+        session.user.followingIds = token.followingIds; // Add this line
+        session.user.role = token.role; // Add this line to include the role
       }
       return session;
     },
