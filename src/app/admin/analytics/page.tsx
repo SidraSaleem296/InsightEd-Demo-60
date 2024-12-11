@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Pie, Line } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -15,7 +15,6 @@ import {
 } from "chart.js";
 import { Shell } from "@/components/layout/shell";
 import { DashboardHeader } from "@/components/pages/dashboard/dashboard-header";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { DataTable } from "@/components/data-table";
 import { CustomPieChart } from "@/components/charts/CustomPieChart";
 
@@ -294,7 +293,7 @@ const AdminAnalyticsPage = () => {
           </div>
         </div>
 
-        {/* Log History */}
+        {/* Log History
         <div className="bg-gray-800 text-white p-4 rounded shadow mt-6">
           <h3 className="text-lg font-semibold text-center">Log History</h3>
           <DataTable
@@ -309,7 +308,7 @@ const AdminAnalyticsPage = () => {
               })
             )}
           />
-        </div>
+        </div> */}
       </div>
     </Shell>
   );
