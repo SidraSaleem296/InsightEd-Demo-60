@@ -1315,9 +1315,14 @@ export function SidebarMenu() {
           href: "/Docs/notes",
         },
         {
-          name: "Chat",
-          icon: <MessageSquare size={15} className="mr-2" />,
+          name: "Doc Search",
+          icon: <Search size={15} className="mr-2" />,
           href: "/Docs/search",
+        },
+        {
+          name: "Course Chatbots",
+          icon: <MessageSquare size={15} className="mr-2" />,
+          href: "/chatbot",
         },
       ],
     },
