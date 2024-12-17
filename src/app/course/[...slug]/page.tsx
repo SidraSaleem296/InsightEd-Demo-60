@@ -242,6 +242,14 @@ type Props = {
 
 const CoursePage = async ({ params: { slug } }: Props) => {
   const [courseId, unitIndexParam, chapterIndexParam] = slug;
+  const session = await getServerSession(authOptions);
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"; // Use NEXT_PUBLIC_BASE_URL or fallback to localhost
+  
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const userId = session.user.id;
 
   // Fetch the course including units, chapters, and questionsC
   const course = await prisma.course.findUnique({
@@ -274,7 +282,7 @@ const CoursePage = async ({ params: { slug } }: Props) => {
     return redirect("/gallery");
   }
 
-  console.log("Chapter data:", chapter); // Log chapter data to check if it's populated correctly
+  // console.log("Chapter data:", chapter); // Log chapter data to check if it's populated correctly
 
   const nextChapter = unit.chapters[chapterIndex + 1];
   const prevChapter = unit.chapters[chapterIndex - 1];
@@ -284,37 +292,104 @@ const CoursePage = async ({ params: { slug } }: Props) => {
   const isLastChapterInCourse =
     isLastChapterInUnit && isLastUnit && nextChapter === undefined;
 
-  // Send notifications
+  // Function to check and add a student to currentStudents if not already present
+  const addStudentToCourse = async (studentId: string) => {
+    // Check if the student is already in `currentStudents` or `passedStudents`
+    const isStudentInCourse =
+      course.currentStudents.includes(studentId) ||
+      course.passedStudents.includes(studentId);
+
+    if (!isStudentInCourse) {
+      // Add the studentId to currentStudents
+      await prisma.course.update({
+        where: { id: courseId },
+        data: {
+          currentStudents: {
+            push: studentId,
+          },
+        },
+      });
+      console.log(`Student ${studentId} added to currentStudents of course.`);
+    } else {
+      console.log(`Student ${studentId} is already part of the course.`);
+    }
+  };
+
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const baseUrl =
-      process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"; // Use NEXT_PUBLIC_BASE_URL or fallback to localhost
-
-    if (isLastChapterInUnit) {
-      // Notify user of unit completion
-      await axios.post(`${baseUrl}/api/notifications/create`, {
-        userId: session.user.id,
-        type: "unit-completion",
-        message: `You have completed "${unit.name}". Well done!`,
-      });
-    }
-
-    if (isLastChapterInCourse) {
-      // Notify user of course completion
-      await axios.post(`${baseUrl}/api/notifications/create`, {
-        userId: session.user.id,
-        type: "course-completion",
-        message: `Congratulations! You have completed the course "${course.name}". 🎉`,
-      });
-    }
+    // Add the student to the course if not already present
+    await addStudentToCourse(userId);
   } catch (error) {
-    console.error("Error creating completion notification:", error);
+    console.error("Error adding user to course list", error);
   }
+
+  const updateProgress = async () => {
+    try {
+      if (isLastChapterInUnit) {
+        // Add user to the current unit's `students` field
+        await prisma.unit.update({
+          where: { id: unit.id },
+          data: {
+            students: {
+              push: userId,
+            },
+          },
+        });
+
+        // Send unit completion notification
+        await axios.post(`${baseUrl}/api/notifications/create`, {
+          userId,
+          type: "unit-completion",
+          message: `You have completed "${unit.name}". Well done!`,
+        });
+      }
+
+      if (isLastChapterInCourse) {
+        // Remove user from all unit's `students` fields in the course
+        for (const courseUnit of course.units) {
+          await prisma.unit.update({
+            where: { id: courseUnit.id },
+            data: {
+              students: {
+                set: courseUnit.students.filter((studentId) => studentId !== userId),
+              },
+            },
+          });
+        }
+
+        // Remove user from course's `currentStudents` field
+        await prisma.course.update({
+          where: { id: courseId },
+          data: {
+            currentStudents: {
+              set: course.currentStudents.filter((studentId) => studentId !== userId),
+            },
+          },
+        });
+
+        // Add user to course's `passedStudents` field
+        await prisma.course.update({
+          where: { id: courseId },
+          data: {
+            passedStudents: {
+              push: userId,
+            },
+          },
+        });
+
+        // Send course completion notification
+        await axios.post(`${baseUrl}/api/notifications/create`, {
+          userId,
+          type: "course-completion",
+          message: `Congratulations! You have completed the course "${course.name}". 🎉`,
+        });
+      }
+    } catch (error) {
+      console.error("Error updating progress or sending notifications:", error);
+    }
+  };
+
+  // Trigger update progress and notifications when applicable
+  await updateProgress();
 
   return (
     <div>

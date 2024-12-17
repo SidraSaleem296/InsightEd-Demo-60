@@ -1286,7 +1286,7 @@ export function SidebarMenu() {
         {
           name: "Dashboard",
           icon: <Home size={15} className="mr-2" style={{ color: "grey" }} />,
-          href: "/Dashboard",
+          href: "/studentDashboard",
         },
         {
           name: "Create",
@@ -1346,6 +1346,11 @@ export function SidebarMenu() {
       name: "Report Generation",
       icon: <FileText size={15} className="mr-2" />,
       href: "/history",
+    },
+    {
+      name: "Audiobooks",
+      icon: <Book size={15} className="mr-2" />,
+      href: "/audiobook",
     },
     {
       name: "Social Platform",

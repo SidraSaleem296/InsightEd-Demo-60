@@ -87,6 +87,9 @@ model Course {
   name  String
   image String
   units Unit[] 
+  currentStudents String[] @db.ObjectId // Array of user IDs currently taking this course
+  passedStudents  String[] @db.ObjectId // Array of user IDs who have completed this course
+
 
   @@index([name], name: "course_name")
 }
@@ -95,7 +98,7 @@ model Course {
 model Unit {
   id       String @id @default(auto()) @map("_id") @db.ObjectId
   courseId String
-
+  students String[] @db.ObjectId // Array of user IDs who have completed this unit
   name     String
   course   Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
   chapters Chapter[] 

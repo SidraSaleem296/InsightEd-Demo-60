@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Pie, Line } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -12,10 +13,10 @@ import {
   CategoryScale,
   LinearScale,
   PointElement,
+  BarElement,
 } from "chart.js";
 import { Shell } from "@/components/layout/shell";
 import { DashboardHeader } from "@/components/pages/dashboard/dashboard-header";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { DataTable } from "@/components/data-table";
 import { CustomPieChart } from "@/components/charts/CustomPieChart";
 
@@ -26,8 +27,15 @@ ChartJS.register(
   LineElement,
   CategoryScale,
   LinearScale,
-  PointElement
+  PointElement,
+  BarElement
 );
+
+type CourseAnalytics = {
+  name: string;
+  enrolled: number;
+  completed: number;
+};
 
 type AnalyticsData = {
   totalUsers: number;
@@ -44,6 +52,7 @@ type AnalyticsData = {
   postsByDate: { date: string; count: number }[];
   feedbacksByDate: { date: string; count: number }[];
   activitiesByDate: { date: string; count: number }[];
+  coursesData: CourseAnalytics[]; // New data for bar chart
 };
 
 const AdminAnalyticsPage = () => {
@@ -178,32 +187,51 @@ const AdminAnalyticsPage = () => {
     ],
   };
 
-  // Prepare data for CustomPieChart
-  const userSubscriptionData = [
-    {
-      name: "Subscribed Users",
-      count: analyticsData.subscribedUsers,
-      color: "#36A2EB",
-    },
-    {
-      name: "Non-Subscribed Users",
-      count: analyticsData.totalUsers - analyticsData.subscribedUsers,
-      color: "#FF6384",
-    },
-  ];
+  // // Prepare data for CustomPieChart
+  // const userSubscriptionData = [
+  //   {
+  //     name: "Subscribed Users",
+  //     count: analyticsData.subscribedUsers,
+  //     color: "#36A2EB",
+  //   },
+  //   {
+  //     name: "Non-Subscribed Users",
+  //     count: analyticsData.totalUsers - analyticsData.subscribedUsers,
+  //     color: "#FF6384",
+  //   },
+  // ];
 
-  const feedbackUsersData = [
-    {
-      name: "Feedback Users",
-      count: analyticsData.feedbackUsers,
-      color: "#4BC0C0",
-    },
-    {
-      name: "Non-Feedback Users",
-      count: analyticsData.totalUsers - analyticsData.feedbackUsers,
-      color: "#FF9F40",
-    },
-  ];
+  // const feedbackUsersData = [
+  //   {
+  //     name: "Feedback Users",
+  //     count: analyticsData.feedbackUsers,
+  //     color: "#4BC0C0",
+  //   },
+  //   {
+  //     name: "Non-Feedback Users",
+  //     count: analyticsData.totalUsers - analyticsData.feedbackUsers,
+  //     color: "#FF9F40",
+  //   },
+  // ];
+
+  // // Bar Chart Data for Course Enrollment and Completion
+  // const courseBarChartData = {
+  //   labels: analyticsData.coursesData.map((course) => course.name),
+  //   datasets: [
+  //     {
+  //       label: "Enrolled Students",
+  //       data: analyticsData.coursesData.map((course) => course.enrolled),
+  //       backgroundColor: "#36A2EB",
+  //       borderRadius: 5,
+  //     },
+  //     {
+  //       label: "Completed Students",
+  //       data: analyticsData.coursesData.map((course) => course.completed),
+  //       backgroundColor: "#4BC0C0",
+  //       borderRadius: 5,
+  //     },
+  //   ],
+  // };
 
   return (
     <Shell>
@@ -217,19 +245,19 @@ const AdminAnalyticsPage = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           {[
             { label: "Total Users", value: analyticsData.totalUsers },
-            { label: "Total Courses", value: analyticsData.totalCourses },
-            { label: "Total Activities", value: analyticsData.totalActivities },
+            // { label: "Total Courses", value: analyticsData.totalCourses },
+            // { label: "Total Activities", value: analyticsData.totalActivities },
             { label: "Total Posts", value: analyticsData.totalPosts },
-            // {
-            //   label: "Documents Uploaded",
-            //   value: analyticsData.totalDocuments,
-            // },
+            {
+              label: "Documents Uploaded",
+              value: analyticsData.totalDocuments,
+            },
             // { label: "Notes Taken", value: analyticsData.totalNotes },
             { label: "Quizzes Attempted", value: analyticsData.totalQuizzes },
-            {
-              label: "Feedback Submitted",
-              value: analyticsData.totalFeedbackSubmitted,
-            },
+            // {
+            //   label: "Feedback Submitted",
+            //   value: analyticsData.totalFeedbackSubmitted,
+            // },
           ].map((metric, idx) => (
             <div
               key={idx}
@@ -240,14 +268,9 @@ const AdminAnalyticsPage = () => {
             </div>
           ))}
         </div>
-
-        {/* Charts */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="text-white p-4 rounded shadow">
-            {/* <h3 className="text-lg font-semibold text-center">
-              User Subscription
-            </h3> */}
-
+          {/* User Subscription Pie Chart */}
+          
             <CustomPieChart
               data={[
                 {
@@ -264,18 +287,36 @@ const AdminAnalyticsPage = () => {
               ]}
               title="User Subscription"
             />
-          </div>
+          
 
-          <div className="bg-gray-800 text-white p-4 rounded shadow">
+          {/* Insights Line Chart */}
+          <div
+            className="bg-gray-800 text-white p-4 rounded shadow"
+            style={{ height: "300px" }} // Set fixed height
+          >
             <h3 className="text-lg mb-3 font-semibold text-center">Insights</h3>
-            <Line data={lineData} />
+            <div style={{ height: "100%" }}>
+              {" "}
+              {/* Make chart fill container */}
+              <Line
+                data={lineData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false, // Allow custom height
+                  plugins: { legend: { position: "top" } },
+                  scales: {
+                    x: { title: { display: true, text: "Date" } },
+                    y: {
+                      title: { display: true, text: "Counts" },
+                      beginAtZero: true,
+                    },
+                  },
+                }}
+              />
+            </div>
           </div>
 
-          <div className="text-white p-4 rounded shadow">
-            {/* <h3 className="text-lg font-semibold text-center">
-              Feedback Users
-            </h3> */}
-  
+          
             <CustomPieChart
               data={[
                 {
@@ -292,9 +333,9 @@ const AdminAnalyticsPage = () => {
               title="Feedback Users"
             />
           </div>
-        </div>
+        
 
-        {/* Log History */}
+        {/* Log History
         <div className="bg-gray-800 text-white p-4 rounded shadow mt-6">
           <h3 className="text-lg font-semibold text-center">Log History</h3>
           <DataTable
@@ -309,6 +350,54 @@ const AdminAnalyticsPage = () => {
               })
             )}
           />
+        </div> */}
+
+        {/* Bar Chart Section */}
+        <div className="mt-8">
+          <h3 className="text-lg font-semibold text-center mb-4">
+            Course Enrollment and Completion
+          </h3>
+          <div className="bg-gray-800 text-white p-4 rounded shadow">
+            <Bar
+              data={{
+                labels: analyticsData.coursesData.map((course) => course.name),
+                datasets: [
+                  {
+                    label: "Enrolled Students",
+                    data: analyticsData.coursesData.map(
+                      (course) => course.enrolled
+                    ),
+                    backgroundColor: "#36A2EB",
+                  },
+                  {
+                    label: "Completed Students",
+                    data: analyticsData.coursesData.map(
+                      (course) => course.completed
+                    ),
+                    backgroundColor: "#4BC0C0",
+                  },
+                ],
+              }}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: { position: "top" },
+                },
+                scales: {
+                  x: {
+                    stacked: true,
+                    title: { display: true, text: "Courses" },
+                  },
+                  y: {
+                    stacked: true,
+                    title: { display: true, text: "Students" },
+                  },
+                },
+              }}
+              height={300}
+            />
+          </div>
         </div>
       </div>
     </Shell>
