@@ -16,3 +16,15 @@ A button to start a new chat session.
 Add the Big Brain Code and set it by watching a youtube channel and then implement in Gitpod and after that in project
 
 Fix if there is time, Admin panel , it's simple data management 
+
+
+
+--------------------------------------------
+
+- When deleting User also make sure to delete the user from all users followers and following list. 
+- Fix Admin Analytics page. 
+- Feedback form and it's routes. Also change the admin analytics route to fetch feeback forms. 
+- Admin Feedback page
+
+
+
