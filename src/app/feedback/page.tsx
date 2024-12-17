@@ -72,7 +72,7 @@ const FeedbackPage = () => {
         </div>
         <button
           type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold py-2 px-4 rounded-md transition duration-300"
+          className="TaaviButton w-full"
         >
           Submit Feedback
         </button>

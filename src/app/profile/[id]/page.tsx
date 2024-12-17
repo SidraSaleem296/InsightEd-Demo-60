@@ -131,8 +131,19 @@ const ProfilePage = ({ params }: { params: { id: string } }) => {
     fetchPosts();
   }, [id]);
 
-  const handleLikeUpdate = (postId: string, newLikeCount: number, liked: boolean) => {
-    console.log("Updating likes for post:", postId, "New Like Count:", newLikeCount, "Liked:", liked);
+  const handleLikeUpdate = (
+    postId: string,
+    newLikeCount: number,
+    liked: boolean
+  ) => {
+    console.log(
+      "Updating likes for post:",
+      postId,
+      "New Like Count:",
+      newLikeCount,
+      "Liked:",
+      liked
+    );
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
         post.id === postId
@@ -145,8 +156,6 @@ const ProfilePage = ({ params }: { params: { id: string } }) => {
       )
     );
   };
-  
-  
 
   if (loading) {
     return <div>Loading...</div>; // Show loading state
@@ -162,17 +171,18 @@ const ProfilePage = ({ params }: { params: { id: string } }) => {
 
   return (
     <div className="container mx-auto p-4">
-      {/* Edit Profile Button
+      {/* Edit Profile Button */}
       {isOwnProfile && (
-        <div className="flex justify-end">
+        <div className="flex justify-end mb-4">
           <button
-            onClick={() => router.push("/editProfile")}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            onClick={() => router.push("/profile/edit")}
+            className="TaaviButton"
           >
             Edit Profile
           </button>
         </div>
-      )} */}
+      )}
+
       {/* User Info */}
       <div className="profile-header text-center flex flex-col items-center">
         <div className="relative inline-block">
@@ -190,39 +200,29 @@ const ProfilePage = ({ params }: { params: { id: string } }) => {
           {profile.name || "Anonymous"}
         </h1>
         <h1 className="text-2x1 font-bold mt-3">
-          {isOwnProfile ? (
-            <ProfileEditableField
-              value={profile.username || "No username"}
-              onSave={(newUsername) => updateProfile({ username: newUsername })}
-            />
-          ) : (
-            profile.username || "No username"
-          )}
+          {profile.username || "No username"}
         </h1>
-        <p className="text-gray-800 mt-2">
-          {isOwnProfile ? (
-            <ProfileEditableField
-              value={profile.bio || "No bio available"}
-              onSave={(newBio) => updateProfile({ bio: newBio })}
-            />
-          ) : (
-            profile.bio || "No bio available"
-          )}
-        </p>
+        {/* User Bio */}
+        <div
+          className="mt-2 p-4 bg-gray-800 text-gray-300 rounded-md w-full max-w-md overflow-y-auto"
+          style={{ maxHeight: "150px", wordWrap: "break-word" }}
+        >
+          {profile.bio || "No bio available"}
+        </div>
       </div>
 
       {/* Follow/Unfollow Button */}
-      <div className="flex justify-center mt-5 mb-5">
-      {session && !isOwnProfile && (
-        <button
-          onClick={handleFollowToggle}
-          className={`px-4 py-2 rounded ${
-            isFollowing ? "bg-red-500" : "bg-blue-500"
-          } text-white`}
-        >
-          {isFollowing ? "Unfollow" : "Follow"}
-        </button>
-      )}
+      <div className="flex justify-center mt-1 mb-5">
+        {session && !isOwnProfile && (
+          <button
+            onClick={handleFollowToggle}
+            className={`TaaviButton ${
+              isFollowing ? "bg-red-500" : "bg-blue-500"
+            } text-white`}
+          >
+            {isFollowing ? "Unfollow" : "Follow"}
+          </button>
+        )}
       </div>
 
       {/* User Stats */}
@@ -258,7 +258,6 @@ const ProfilePage = ({ params }: { params: { id: string } }) => {
                 onCommentAdded={(postId) => {
                   console.log("Comment added for post:", postId);
                 }} // Optional
-              
               />
             ))}
           </div>

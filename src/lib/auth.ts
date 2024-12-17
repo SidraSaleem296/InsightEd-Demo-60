@@ -77,6 +77,8 @@ declare module "next-auth" {
       credits: number;
       followingIds: string[]; // Add this line
       role: string; // Add this line
+      username: string; // Add username
+      bio: string; // Add bio
     } & DefaultSession["user"];
   }
 }
@@ -87,6 +89,8 @@ declare module "next-auth/jwt" {
     credits: number;
     followingIds: string[]; // Add this line
     role: string; // Add this line
+    username: string; // Add username
+    bio: string; // Add bio
   }
 }
 
@@ -107,6 +111,8 @@ export const authOptions: NextAuthOptions = {
         token.credits = db_user.credits;
         token.followingIds = db_user.followingIds; // Add this line
         token.role = db_user.role; // Add this line to include the role
+        token.username = db_user.username || ""; // Default to empty string
+        token.bio = db_user.bio || ""; // Default to empty string
       }
       return token;
     },
@@ -119,6 +125,8 @@ export const authOptions: NextAuthOptions = {
         session.user.credits = token.credits;
         session.user.followingIds = token.followingIds; // Add this line
         session.user.role = token.role; // Add this line to include the role
+        session.user.username = token.username; // Add username
+        session.user.bio = token.bio; // Add bio
       }
       return session;
     },

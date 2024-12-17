@@ -166,63 +166,89 @@ const Post: React.FC<PostProps> = ({ post, onLike, onCommentAdded }) => {
 
       {/* Comment Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-            <h3 className="text-lg font-bold mb-4">Comments</h3>
-            {loadingComments ? (
-              <p>Loading comments...</p>
-            ) : (
-              <div className="h-48 overflow-y-auto mb-4 border rounded p-2">
-                {comments.length > 0 ? (
-                  <ul>
-                    {comments.map((comment) => (
-                      <li key={comment.id} className="mb-4 flex items-start">
-                        <Image
-                          src={comment.user.image || "/default-avatar.png"}
-                          alt={comment.user.name}
-                          width={40}
-                          height={40}
-                          className="rounded-full mr-3"
-                        />
-                        <div>
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
+          <div className="bg-gray-800 text-white p-6 rounded-lg shadow-lg w-full max-w-3xl h-[75vh] flex flex-col">
+            {/* Post Content and User Details */}
+            <div className="mb-4 border-b border-gray-700 pb-4 flex items-start gap-4">
+              <Image
+                src={post.user?.image || "/default-avatar.png"}
+                alt={post.user?.name || "User"}
+                width={50}
+                height={50}
+                className="rounded-full"
+              />
+              <div>
+                <p className="text-lg font-semibold">{post.user?.name}</p>
+                <p className="text-sm text-gray-400">@{post.user?.username}</p>
+                <p className="mt-2">{post.body}</p>
+              </div>
+            </div>
+
+            {/* Comments Section */}
+            <div
+              className="flex-grow overflow-y-auto mb-4 border border-gray-700 rounded p-4 bg-gray-900 custom-scrollbar"
+              style={{ maxHeight: "50vh" }} // Fixed height for the comments area
+            >
+              {loadingComments ? (
+                <p>Loading comments...</p>
+              ) : comments.length > 0 ? (
+                <ul>
+                  {comments.map((comment) => (
+                    <li
+                      key={comment.id}
+                      className="mb-4 flex items-start gap-3"
+                    >
+                      <Image
+                        src={comment.user.image || "/default-avatar.png"}
+                        alt={comment.user.name}
+                        width={40}
+                        height={40}
+                        className="rounded-full"
+                      />
+                      <div>
                         <Link href={`/profile/${comment.user.id}`}>
-                          <p className="font-semibold text-black hover:underline">
+                          <p className="font-semibold hover:underline text-white">
                             {comment.user.username}
                           </p>
-                          </Link>
-                          <p className="text-gray-700">{comment.body}</p>
-                          <span className="text-xs text-gray-500">
-                            {new Date(comment.createdAt).toLocaleString()}
-                          </span>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>No comments yet.</p>
-                )}
+                        </Link>
+                        <p className="text-gray-300">{comment.body}</p>
+                        <span className="text-xs text-gray-500">
+                          {new Date(comment.createdAt).toLocaleString()}
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-gray-400">
+                  No comments yet. Be the first to comment!
+                </p>
+              )}
+            </div>
+
+            {/* Comment Input and Buttons */}
+            <div>
+              <textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                className="w-full bg-gray-700 text-white border border-gray-600 rounded p-2 mb-4 resize-none"
+                rows={3}
+                placeholder="Write your comment here..."
+              ></textarea>
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={handleAddComment}
+                  className="TaaviButton bg-blue-500 hover:bg-blue-600"
+                >
+                  Submit
+                </button>
+                <button
+                  onClick={closeCommentModal}
+                  className="TaaviButton bg-gray-600 hover:bg-gray-700"
+                >
+                  Cancel
+                </button>
               </div>
-            )}
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              className="w-full border rounded p-2 mb-4"
-              rows={3}
-              placeholder="Write your comment here..."
-            ></textarea>
-            <div className="flex justify-end space-x-2">
-              <button
-                onClick={handleAddComment}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              >
-                Submit
-              </button>
-              <button
-                onClick={closeCommentModal}
-                className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
-              >
-                Cancel
-              </button>
             </div>
           </div>
         </div>
