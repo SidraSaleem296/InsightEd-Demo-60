@@ -42,29 +42,42 @@ model Session {
 
 // User Model
 model User {
-  id                String    @id @default(auto()) @map("_id") @db.ObjectId
+  id                String      @id @default(auto()) @map("_id") @db.ObjectId
   name              String?
   username          String?   
   bio               String?
-  email             String?   @unique
+  email             String?     @unique
   emailVerified     DateTime?
   image             String?
   coverImage        String?
   profileImage      String?
   hashedPassword    String?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  followerIds      String[]   @db.ObjectId
-  followingIds      String[]   @db.ObjectId
-  hasNotifications   Boolean?
-  credits           Int       @default(10) // Added from the first User model
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  followerIds       String[]    @db.ObjectId
+  followingIds      String[]    @db.ObjectId
+  hasNotifications  Boolean?
+  credits           Int         @default(10) // Added from the first User model
   games             Game[]
   accounts          Account[]
   sessions          Session[]
   posts             Post[]
   comments          Comment[]
-  notifications     Notifications[]
+  notifications     Notification[]
   activities        Activity[] 
+  role              String      @default("user") // "user" or "admin"
+  feedbackSubmitted Boolean     @default(false) // Indicates if feedback has been submitted
+  feedbacks         Feedback[]  // Relation to Feedback
+}
+
+// New Feedback Model
+model Feedback {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  content     String
+  isAnonymous Boolean   @default(false) // Indicates if the feedback is anonymous
+  userId      String?   @db.ObjectId // Nullable, as it can be null for anonymous feedback
+  user        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
 }
 
 
@@ -73,7 +86,10 @@ model Course {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
   name  String
   image String
-  units Unit[]
+  units Unit[] 
+  currentStudents String[] @db.ObjectId // Array of user IDs currently taking this course
+  passedStudents  String[] @db.ObjectId // Array of user IDs who have completed this course
+
 
   @@index([name], name: "course_name")
 }
@@ -82,10 +98,10 @@ model Course {
 model Unit {
   id       String @id @default(auto()) @map("_id") @db.ObjectId
   courseId String
-
+  students String[] @db.ObjectId // Array of user IDs who have completed this unit
   name     String
-  course   Course    @relation(fields: [courseId], references: [id])
-  chapters Chapter[]
+  course   Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  chapters Chapter[] 
 
   @@index([courseId], name: "unit_courseId")
 }
@@ -98,7 +114,7 @@ model Chapter {
   youtubeSearchQuery String
   videoId            String?
   summary            String?
-  unit               Unit        @relation(fields: [unitId], references: [id])
+  unit               Unit        @relation(fields: [unitId], references: [id], onDelete: Cascade)
   questionsC         QuestionC[] // Added to create the relation with QuestionC
 
   @@index([unitId], name: "chapter_unitId")
@@ -165,7 +181,7 @@ model QuestionC {
   question String
   answer   String
   options  String
-  chapter  Chapter  @relation(fields: [chapterId], references: [id])
+  chapter  Chapter  @relation(fields: [chapterId], references: [id], onDelete: Cascade)
 
   @@index([chapterId], name: "chapterId")
 }
@@ -202,14 +218,16 @@ model Comment {
 }
 
 
-// Notifications Model
-model Notifications {
-  id String   @id @default(auto()) @map("_id") @db.ObjectId
-  body String
+model Notification {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String
+  type      String
+  message   String
+  postId    String?
   createdAt DateTime @default(now())
-  userId String @db.ObjectId
+  read      Boolean  @default(false)
 
-  user User @relation(fields: [userId], references: [id], onDelete:Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Relating notifications to the user
 }
 
 model Activity {

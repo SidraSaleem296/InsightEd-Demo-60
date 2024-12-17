@@ -1,4 +1,4 @@
-// //correct one 
+// //correct one
 // /** @type {import('next').NextConfig} */
 // const nextConfig = {
 //   images: {
@@ -35,11 +35,11 @@
 //     ignoreBuildErrors: true,
 //   },
 //   output: "standalone",
-//   productionBrowserSourceMaps: true, 
+//   productionBrowserSourceMaps: true,
 //   webpack: (config) => {
 //     config.resolve.fallback = {
 //       ...config.resolve.fallback, // Merge with existing fallback settings
-//       crypto: false, 
+//       crypto: false,
 //       http: false,
 //       https: false,
 //       // Disable crypto module on client-side
@@ -72,11 +72,11 @@
 //     ignoreBuildErrors: true,
 //   },
 //   output: "standalone",
-//   productionBrowserSourceMaps: true, 
+//   productionBrowserSourceMaps: true,
 //   webpack: (config) => {
 //     config.resolve.fallback = {
 //       ...config.resolve.fallback, // Merge with existing fallback settings
-//       crypto: false, 
+//       crypto: false,
 //       http: false,
 //       https: false,
 //       // Disable crypto module on client-side
@@ -88,12 +88,11 @@
 
 // module.exports = nextConfig;
 
-
 module.exports = {
   images: {
     remotePatterns: [
-      { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
-      { protocol: 'https', hostname: 's3.us-west-2.amazonaws.com' },
+      { protocol: "https", hostname: "lh3.googleusercontent.com" },
+      { protocol: "https", hostname: "s3.us-west-2.amazonaws.com" },
     ],
   },
   eslint: {
@@ -102,7 +101,7 @@ module.exports = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  output: 'standalone',
+  output: "standalone",
   productionBrowserSourceMaps: true,
   webpack: (config) => {
     config.resolve.fallback = {
@@ -110,7 +109,7 @@ module.exports = {
       crypto: false,
       http: false,
       https: false,
-      process: require.resolve('process/browser'),
+      process: require.resolve("process/browser"),
     };
     return config;
   },
@@ -118,19 +117,16 @@ module.exports = {
   async rewrites() {
     return [
       {
-        source: '/api/stripe',
-        destination: '/api/stripe',
+        source: "/api/stripe",
+        destination: "/api/stripe",
       },
       {
-        source: '/search',
-        destination: '/search',
+        source: "/search",
+        destination: "/search",
       },
     ];
   },
 };
-
-
-
 
 // const webpack = require('webpack');
 
@@ -171,7 +167,6 @@ module.exports = {
 //   },
 // };
 
-
 // next.config.js
 // const webpack = require('webpack');
 
@@ -199,8 +194,6 @@ module.exports = {
 //   },
 // };
 
-
-
 // const webpack = require('webpack');
 
 // module.exports = {
@@ -226,10 +219,6 @@ module.exports = {
 //     return config;
 //   },
 // };
-
-
-
-
 
 // const webpack = require('webpack');
 
@@ -258,7 +247,6 @@ module.exports = {
 //     return config;
 //   },
 // };
-
 
 //Much better
 
@@ -304,10 +292,6 @@ module.exports = {
 
 // module.exports = nextConfig;
 
-
-
-
-
 // const webpack = require('webpack');
 
 // /** @type {import('next').NextConfig} */
@@ -346,8 +330,6 @@ module.exports = {
 // };
 
 // module.exports = nextConfig;
-
-
 
 // const webpack = require('webpack');
 
@@ -434,8 +416,6 @@ module.exports = {
 // };
 
 // module.exports = nextConfig;
-
-
 
 //Better
 // const webpack = require('webpack');
