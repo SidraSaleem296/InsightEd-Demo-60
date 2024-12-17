@@ -24,6 +24,28 @@ export async function POST(request: Request) {
       },
     });
 
+    // Fetch the user's followers
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { followerIds: true },
+    });
+
+    if (user?.followerIds && user.followerIds.length > 0) {
+      // Create notifications for all followers
+      await Promise.all(
+        user.followerIds.map((followerId) =>
+          prisma.notification.create({
+            data: {
+              userId: followerId,
+              type: "new_post",
+              message: `${session.user.name || "Someone"} posted something new.`,
+              postId: session.user.id,
+            },
+          })
+        )
+      );
+    }
+
     return NextResponse.json(post, { status: 201 });
   } catch (error) {
     console.error("Error creating post:", error);
