@@ -56,7 +56,7 @@
 // pages/api/posts/followed.js
 import { NextResponse } from 'next/server';
 import { getSession } from 'next-auth/react';  // Or your own session logic
-import prisma from 'your-prisma-instance';
+import prisma from '@/lib/prismadb';
 
 export async function GET(req) {
   try {
