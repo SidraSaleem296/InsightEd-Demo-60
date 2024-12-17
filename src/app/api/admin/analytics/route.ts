@@ -134,6 +134,21 @@ export async function GET() {
       }))
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()); // Sort by date ascending
 
+      // Fetch course data for enrollment and completion
+    const courses = await prisma.course.findMany({
+      select: {
+        name: true,
+        currentStudents: true, // Fetch enrolled students
+        passedStudents: true, // Fetch completed students
+      },
+    });
+      
+      const coursesData = courses.map((course) => ({
+        name: course.name,
+        enrolled: course.currentStudents.length, // Number of enrolled students
+        completed: course.passedStudents.length, // Number of completed students
+      }));
+
     return NextResponse.json({
       totalUsers,
       subscribedUsers,
@@ -149,6 +164,7 @@ export async function GET() {
       postsByDate,
       feedbacksByDate,
       activitiesByDate,
+      coursesData, 
     });
   } catch (error) {
     console.error("Error fetching analytics data:", error);

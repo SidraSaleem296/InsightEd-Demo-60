@@ -20,7 +20,7 @@ export function CustomPieChart({ data, title }: CustomPieChartProps) {
       </h3>
       <div className="flex flex-col md:flex-row items-center justify-center">
         {/* Chart Container */}
-        <ResponsiveContainer width="50%" height={300}>
+        <ResponsiveContainer width="50%" height={200}>
           <PieChart>
             <Pie
               data={data}
