@@ -1,3 +1,4 @@
+'use client'
 import * as pdfjsLib from "pdfjs-dist/build/pdf";
 
 // Use a specific version of the worker hosted on a CDN
