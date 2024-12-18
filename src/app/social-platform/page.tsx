@@ -107,7 +107,7 @@ export default function FeedPage() {
                     className="rounded-full mr-2"
                   />
                   <div>
-                    <p className="font-semibold">{user.name || "Unknown User"}</p>
+                    <p className="font-semibold text-black">{user.name || "Unknown User"}</p>
                     <p className="text-sm text-gray-500">@{user.username || "unknown"}</p>
                   </div>
                 </div>

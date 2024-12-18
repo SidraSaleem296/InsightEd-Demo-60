@@ -51,7 +51,7 @@ const BlogPost = () => {
       <div className="flex flex-col items-center">
         <label
           htmlFor="fileInput"
-          className="cursor-pointer px-6 py-2 mb-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition duration-300"
+          className="TaaviButton"
         >
           Upload PDF
         </label>

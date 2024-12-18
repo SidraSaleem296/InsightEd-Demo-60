@@ -55,10 +55,10 @@ const NotificationCenter = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Notifications</h1>
+      <h1 className="text-2xl font-bold mb-1">Notifications</h1>
       <button
         onClick={clearAllNotifications}
-        className="bg-red-500 text-white px-4 py-2 rounded mb-4 hover:bg-red-600"
+        className="TaaviButton mb-4"
       >
         Clear All Notifications
       </button>
@@ -71,14 +71,14 @@ const NotificationCenter = () => {
               key={notification.id}
               className="p-4 border rounded shadow hover:shadow-lg flex justify-between items-center"
             >
-              <Link href={`/profile/${notification.postId}`} className="text-blue-500 hover:underline">
+              <Link href={`/profile/${notification.postId}`} className="text-white-500 hover:underline">
                 {notification.message}
               </Link>
               <button
                 onClick={() => deleteNotification(notification.id)}
-                className="text-red-500 hover:underline"
+                className="text-white-500 hover:underline"
               >
-                Clear
+                X
               </button>
             </li>
           ))}
