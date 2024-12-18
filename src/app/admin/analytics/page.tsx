@@ -246,12 +246,12 @@ const AdminAnalyticsPage = () => {
           {[
             { label: "Total Users", value: analyticsData.totalUsers },
             // { label: "Total Courses", value: analyticsData.totalCourses },
-            // { label: "Total Activities", value: analyticsData.totalActivities },
+            { label: "Total Activities", value: analyticsData.totalActivities },
             { label: "Total Posts", value: analyticsData.totalPosts },
-            {
-              label: "Documents Uploaded",
-              value: analyticsData.totalDocuments,
-            },
+            // {
+            //   label: "Documents Uploaded",
+            //   value: analyticsData.totalDocuments,
+            // },
             // { label: "Notes Taken", value: analyticsData.totalNotes },
             { label: "Quizzes Attempted", value: analyticsData.totalQuizzes },
             // {

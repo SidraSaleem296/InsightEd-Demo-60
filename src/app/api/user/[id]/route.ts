@@ -81,17 +81,18 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 }
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
-  const updates = await req.json();
+  const { id } = params; // Get user ID from URL params
+  const body = await req.json();
+  const { username, bio } = body;
 
   try {
     const updatedUser = await prisma.user.update({
       where: { id },
-      data: updates,
+      data: { username, bio },
     });
-    return NextResponse.json(updatedUser);
+    return new Response(JSON.stringify(updatedUser), { status: 200 });
   } catch (error) {
-    console.error("Error updating user:", error);
-    return NextResponse.json({ error: "Failed to update profile" }, { status: 500 });
+    console.error("Error updating profile:", error);
+    return new Response("Failed to update user", { status: 500 });
   }
 }
